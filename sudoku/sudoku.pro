@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-        sudoku.cpp
+        sudoku.cpp \
+		dancing_link.cpp
 
 HEADERS  += mainwindow.h \
         utils.h \
-        sudoku.h
+        sudoku.h \
+		dancing_link.h
 
 FORMS    += mainwindow.ui

@@ -17,6 +17,7 @@ public:
 	DancingLink(int row_num, int col_num) { init(row_num, col_num); }
 
 	void init(int row_num, int col_num);
+	// cols must be sorted ascending
 	void append_row(const IntList& cols);
 	IntList solve();
 

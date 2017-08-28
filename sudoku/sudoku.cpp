@@ -14,6 +14,16 @@ bool Sudoku::_check_coord(int x, int y) const
 	return true;
 }
 
+bool Sudoku::is_empty() const
+{
+	return count(grids_.begin(), grids_.end(), 0) == span_ * span_;
+}
+
+void Sudoku::clear()
+{
+	fill(grids_.begin(), grids_.end(), 0);
+}
+
 bool Sudoku::reset(int x, int y)
 {
 	return set(x, y, 0);
@@ -149,9 +159,6 @@ Sudoku Sudoku::solve() const
 	}
 
 	IntList dlx_rows = dlx.solve();
-	if(dlx_rows.size() != (size_t)span2)
-		return {};
-
 	Sudoku ans = *this;
 
 	for(int row : dlx_rows)
@@ -160,6 +167,9 @@ Sudoku Sudoku::solve() const
 		int id = (row - 1) / span_;
 		ans.grids_[id] = v;
 	}
+
+	if(dlx_rows.size() != (unsigned)span2)
+		ans.clear();
 
 	return ans;
 }
