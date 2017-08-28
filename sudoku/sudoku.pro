@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+        sudoku.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+        utils.h \
+        sudoku.h
 
 FORMS    += mainwindow.ui
