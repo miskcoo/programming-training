@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "sudoku.h"
+#include "dancing_link.h"
 
 Sudoku::Sudoku(int size)
 	: size_(size), span_(size * size), grids_(span_ * span_, 0)
@@ -122,6 +123,43 @@ IntList Sudoku::get_available(int x, int y) const
 
 Sudoku Sudoku::solve() const
 {
-	// TODO
-	return {};
+	int span2 = span_ * span_;
+	int row_num = span2 * span_;
+	int col_num = span2 * 4;
+
+	DancingLink dlx(row_num, col_num);
+	for(int r = 0; r != span_; ++r)
+	{
+		for(int c = 0; c != span_; ++c)
+		{
+			int now_v = get(r, c);
+			for(int v = 0; v != span_; ++v)
+			{
+				if(now_v != 0 && now_v != v + 1)
+					continue;
+				int g = r / size_ * size_ + c / size_;
+				dlx.append_row( {
+					r * span_ + c + 1,             // existance
+					r * span_ + v + span2 + 1,     // rows consistency
+					c * span_ + v + span2 * 2 + 1, // columns consistency
+					g * span_ + v + span2 * 3 + 1  // grids consistency
+				} );
+			}
+		}
+	}
+
+	IntList dlx_rows = dlx.solve();
+	if(dlx_rows.size() != (size_t)span2)
+		return {};
+
+	Sudoku ans = *this;
+
+	for(int row : dlx_rows)
+	{
+		int v = (row - 1) % span_ + 1;
+		int id = (row - 1) / span_;
+		ans.grids_[id] = v;
+	}
+
+	return ans;
 }
