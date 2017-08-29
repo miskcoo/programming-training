@@ -20,6 +20,8 @@ public:
 	bool reset(int x, int y);
 	// set (x, y) to be of value v
 	bool set(int x, int y, int v);
+	// try to set (x, y) to be of value v
+	bool try_set(int x, int y, int v);
 	// get the value of (x, y)
 	int get(int x, int y) const;
 	// check whether the current status is consistent
@@ -28,7 +30,8 @@ public:
 	IntList get_available(int x, int y) const;
 	// solve this sudoku puzzle
 	Sudoku solve() const;
-
+	// get span
+	int span() const;
 private:
 	bool _check_coord(int x, int y) const;
 };

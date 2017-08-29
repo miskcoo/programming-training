@@ -24,12 +24,26 @@ void Sudoku::clear()
 	fill(grids_.begin(), grids_.end(), 0);
 }
 
+int Sudoku::span() const
+{
+	return span_;
+}
+
 bool Sudoku::reset(int x, int y)
 {
 	return set(x, y, 0);
 }
 
 bool Sudoku::set(int x, int y, int v)
+{
+	if(!_check_coord(x, y))
+		return false;
+
+	grids_[x * span_ + y] = v;
+	return true;
+}
+
+bool Sudoku::try_set(int x, int y, int v)
 {
 	if(!_check_coord(x, y))
 		return false;
