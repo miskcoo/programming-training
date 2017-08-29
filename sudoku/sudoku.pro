@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QMAKE_CXXFLAGS += -std=c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,13 +14,18 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+        widget.cpp \
         sudoku.cpp \
-		dancing_link.cpp
+        dancing_link.cpp \
+		sudoku_grid.cpp \
+    sudoku_cell.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += widget.h \
         utils.h \
         sudoku.h \
-		dancing_link.h
+        dancing_link.h \
+		config.h \
+		sudoku_grid.h \
+    sudoku_cell.h
 
-FORMS    += mainwindow.ui
+FORMS    += widget.ui
