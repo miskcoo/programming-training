@@ -5,9 +5,9 @@
 
 class SudokuCell : public QLabel
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit SudokuCell(QWidget *parent = 0);
+	explicit SudokuCell(QWidget *parent = 0);
 
 signals:
 

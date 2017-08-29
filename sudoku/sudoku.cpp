@@ -149,8 +149,8 @@ Sudoku Sudoku::solve() const
 					continue;
 				int g = r / size_ * size_ + c / size_;
 				dlx.append_row( {
-					r * span_ + c + 1,             // existance
-					r * span_ + v + span2 + 1,     // rows consistency
+					r * span_ + c + 1,			 // existance
+					r * span_ + v + span2 + 1,	 // rows consistency
 					c * span_ + v + span2 * 2 + 1, // columns consistency
 					g * span_ + v + span2 * 3 + 1  // grids consistency
 				} );

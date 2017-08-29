@@ -1,7 +1,7 @@
 #include "sudoku_cell.h"
 
 SudokuCell::SudokuCell(QWidget *parent)
-    : QLabel(parent)
+	: QLabel(parent)
 {
-    setStyleSheet("background-color: #DDD;");
+	setStyleSheet("background-color: #ccc;");
 }

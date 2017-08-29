@@ -10,15 +10,16 @@ class Widget;
 
 class Widget : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = 0);
-    ~Widget();
+	explicit Widget(QWidget *parent = 0);
+	~Widget();
 
 private:
-    Ui::Widget *ui;
-    SudokuGrid *grid;
+	Ui::Widget *ui;
+	QVBoxLayout *layout;
+	SudokuGrid *grid;
 };
 
 #endif // WIDGET_H
