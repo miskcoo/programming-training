@@ -18,7 +18,7 @@ public:
 
 	void init(int row_num, int col_num);
 	// cols must be sorted ascending
-	void append_row(const IntList& cols);
+	int append_row(const IntList& cols);
 	IntList solve();
 
 private:

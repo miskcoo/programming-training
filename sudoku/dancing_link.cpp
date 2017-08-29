@@ -25,7 +25,7 @@ void DancingLink::init(int row_num, int col_num)
 	R[col_num] = 0;
 }
 
-void DancingLink::append_row(const IntList& cols)
+int DancingLink::append_row(const IntList& cols)
 {
 	int first_node_now = node_now;
 	for(int col : cols)
@@ -44,7 +44,7 @@ void DancingLink::append_row(const IntList& cols)
 
 	L[first_node_now] = node_now - 1;
 	R[node_now - 1] = first_node_now;
-	++row_now;
+	return row_now++;
 }
 
 void DancingLink::remove(int col)

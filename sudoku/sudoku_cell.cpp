@@ -5,25 +5,26 @@
 SudokuCell::SudokuCell(int row, int col, std::shared_ptr<Sudoku> sudoku, QWidget *parent)
 	: QLabel(parent),
 	  row(row), col(col),
+	  initial_status(0),
 	  sudoku(sudoku),
 	  is_vertical_selected(false),
 	  is_horizontal_selected(false),
 	  value_fixed(false),
-	  candidates(sudoku->span(), 0)
+	  candidates(sudoku->span() + 1, 0)
 {
-	setStyleSheet("background-color: #ccc;");
+	update_style();
 }
 
 void SudokuCell::vertical_selected()
 {
 	is_vertical_selected = true;
-	setStyleSheet("background-color: #999;");
+	update_style();
 }
 
 void SudokuCell::horizontal_selected()
 {
 	is_horizontal_selected = true;
-	setStyleSheet("background-color: #999;");
+	update_style();
 }
 
 void SudokuCell::free_selection()
@@ -32,7 +33,7 @@ void SudokuCell::free_selection()
 		emit free_signal();
 	is_vertical_selected = false;
 	is_horizontal_selected = false;
-	setStyleSheet("background-color: #ccc;");
+	update_style();
 }
 
 void SudokuCell::add_value(int v)
@@ -61,6 +62,19 @@ void SudokuCell::remove_value(int v)
 				break;
 			}
 	}
+}
+
+void SudokuCell::update_style()
+{
+	QString text_color = "black",
+			bg_color = "#ccc";
+
+	if(!initial_status) text_color = "#666";
+	if(is_vertical_selected || is_horizontal_selected)
+		bg_color = "#999";
+
+	setStyleSheet("background-color: " + bg_color + ";"
+				  "color: " + text_color + ";");
 }
 
 void SudokuCell::update_font()
@@ -138,7 +152,8 @@ void SudokuCell::update_text()
 
 void SudokuCell::mousePressEvent(QMouseEvent *)
 {
-	emit selected_signal(this);
+	if(initial_status == 0)
+		emit selected_signal(this);
 }
 
 void SudokuCell::keyPressEvent(QKeyEvent *ev)
@@ -157,4 +172,19 @@ void SudokuCell::focusInEvent(QFocusEvent *)
 
 void SudokuCell::focusOutEvent(QFocusEvent *)
 {
+}
+
+void SudokuCell::set_initial_status(int v)
+{
+	initial_status = v;
+	fill(candidates.begin(), candidates.end(), 0);
+	if(v) add_value(v);
+	else update_text();
+
+	update_style();
+}
+
+int SudokuCell::get_initial_status() const
+{
+	return initial_status;
 }

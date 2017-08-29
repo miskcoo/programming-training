@@ -98,5 +98,12 @@ void SudokuGrid::remove_value(int v)
 
 void SudokuGrid::game_start()
 {
-	// TODO: Generate Sudoku puzzle
+	// TODO: Level selection
+	sudoku->random_sudoku(11, 50, 0);
+	for(int r = 0; r != cell_span; ++r)
+		for(int c = 0; c != cell_span; ++c)
+		{
+			int id = r * cell_span + c;
+			cells[id]->set_initial_status(sudoku->get(r, c));
+		}
 }

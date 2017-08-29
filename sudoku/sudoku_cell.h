@@ -12,6 +12,9 @@ class SudokuCell : public QLabel
 public:
 	explicit SudokuCell(int row, int col, std::shared_ptr<Sudoku> sudoku, QWidget *parent = 0);
 
+	void set_initial_status(int v);
+	int get_initial_status() const;
+
 signals:
 	void selected_signal(SudokuCell*);
 	void free_signal();
@@ -33,9 +36,10 @@ protected:
 private:
 	void update_text();
 	void update_font();
+	void update_style();
 
 private:
-	int row, col;
+	int row, col, initial_status;
 	std::shared_ptr<Sudoku> sudoku;
 
 	bool is_vertical_selected, is_horizontal_selected;

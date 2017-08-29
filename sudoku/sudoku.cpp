@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <cstdlib>
+#include <map>
 #include "sudoku.h"
 #include "dancing_link.h"
 
@@ -151,6 +153,7 @@ Sudoku Sudoku::solve() const
 	int row_num = span2 * span_;
 	int col_num = span2 * 4;
 
+	std::map<int, std::pair<int, int>> row_map;
 	DancingLink dlx(row_num, col_num);
 	for(int r = 0; r != span_; ++r)
 	{
@@ -162,12 +165,14 @@ Sudoku Sudoku::solve() const
 				if(now_v != 0 && now_v != v + 1)
 					continue;
 				int g = r / size_ * size_ + c / size_;
-				dlx.append_row( {
+				int row_id = dlx.append_row( {
 					r * span_ + c + 1,			 // existance
 					r * span_ + v + span2 + 1,	 // rows consistency
 					c * span_ + v + span2 * 2 + 1, // columns consistency
 					g * span_ + v + span2 * 3 + 1  // grids consistency
 				} );
+
+				row_map[row_id] = std::make_pair(r * span_ + c, v + 1);
 			}
 		}
 	}
@@ -177,13 +182,95 @@ Sudoku Sudoku::solve() const
 
 	for(int row : dlx_rows)
 	{
-		int v = (row - 1) % span_ + 1;
-		int id = (row - 1) / span_;
-		ans.grids_[id] = v;
+		auto info = row_map[row];
+		ans.grids_[info.first] = info.second;
 	}
 
 	if(dlx_rows.size() != (unsigned)span2)
 		ans.clear();
 
 	return ans;
+}
+
+void Sudoku::exchange_column(int c1, int c2)
+{
+	if(0 <= c1 && c1 < span_ && 0 <= c2 && c2 <= span_)
+	{
+		for(int r = 0; r != span_; ++r)
+			std::swap(grids_[r * span_ + c1], grids_[r * span_ + c2]);
+	}
+}
+
+void Sudoku::exchange_row(int r1, int r2)
+{
+	if(0 <= r1 && r1 < span_ && 0 <= r2 && r2 <= span_)
+	{
+		for(int c = 0; c != span_; ++c)
+			std::swap(grids_[r1 * span_ + c], grids_[r2 * span_ + c]);
+	}
+}
+
+void Sudoku::exchange_number(int v1, int v2)
+{
+	if(1 <= v1 && v1 <= span_ && 1 <= v2 && v2 <= span_)
+	{
+		for(int& cell : grids_)
+		{
+			if(cell == v1) cell = v2;
+			else if(cell == v2) cell = v1;
+		}
+	}
+}
+
+void Sudoku::random_exchange(int times)
+{
+	for(int i = 0; i != times; ++i)
+	{
+		int type = std::rand() % 3;
+		if(type == 0)
+		{
+			int v1 = std::rand() % span_ + 1;
+			int v2 = std::rand() % span_ + 1;
+			exchange_number(v1, v2);
+		} else {
+			int l = std::rand() % size_ * size_;
+			int l1 = l + std::rand() % size_;
+			int l2 = l + std::rand() % size_;
+			if(type == 1) exchange_row(l1, l2);
+			else exchange_column(l1, l2);
+		}
+	}
+}
+
+void Sudoku::random_sudoku(int init_cells, int empty_cells, int)
+{
+	clear();
+
+	// randomly fill `init_cells` cells
+	auto try_random_one = [this] () -> bool {
+		int r = std::rand() % span_, c = std::rand() % span_;
+		if(get(r, c) != 0) return false;
+		IntList avail = get_available(r, c);
+		if(avail.empty()) return false;
+		set(r, c, avail[std::rand() % avail.size()]);
+		return true;
+	};
+
+	for(int count = 0; count < init_cells; count += try_random_one());
+	*this = solve();
+
+	// random exchange row/column/value
+	random_exchange(30);
+
+	// digging empty cells
+	auto try_dig_one = [this] () -> bool {
+		int r = std::rand() % span_, c = std::rand() % span_;
+		if(get(r, c) == 0) return false;
+		reset(r, c);
+		return true;
+	};
+
+	for(int i = 0; i < empty_cells; i += try_dig_one());
+
+	// TODO: level selection
 }

@@ -32,6 +32,13 @@ public:
 	Sudoku solve() const;
 	// get span
 	int span() const;
+
+public:
+	void exchange_number(int v1, int v2);
+	void exchange_row(int r1, int r2);
+	void exchange_column(int c1, int c2);
+	void random_exchange(int times);
+	void random_sudoku(int init_cells, int empty_cells, int lower_bound);
 private:
 	bool _check_coord(int x, int y) const;
 };
