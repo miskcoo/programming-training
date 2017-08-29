@@ -23,6 +23,7 @@ public slots:
 	void remove_value(int);
 
 	void game_start();
+	void game_hint();
 
 private:
 	int cell_size, cell_span, fixed_size;

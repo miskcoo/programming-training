@@ -244,33 +244,39 @@ void Sudoku::random_exchange(int times)
 
 void Sudoku::random_sudoku(int init_cells, int empty_cells, int)
 {
-	clear();
+	auto try_random = [=, this] () -> bool {
+		clear();
 
-	// randomly fill `init_cells` cells
-	auto try_random_one = [this] () -> bool {
-		int r = std::rand() % span_, c = std::rand() % span_;
-		if(get(r, c) != 0) return false;
-		IntList avail = get_available(r, c);
-		if(avail.empty()) return false;
-		set(r, c, avail[std::rand() % avail.size()]);
+		// randomly fill `init_cells` cells
+		auto try_random_one = [this] () -> bool {
+			int r = std::rand() % span_, c = std::rand() % span_;
+			if(get(r, c) != 0) return false;
+			IntList avail = get_available(r, c);
+			if(avail.empty()) return false;
+			set(r, c, avail[std::rand() % avail.size()]);
+			return true;
+		};
+
+		for(int count = 0; count < init_cells; count += try_random_one());
+		*this = solve();
+		if(is_empty()) return false;
+
+		// random exchange row/column/value
+		random_exchange(30);
+
+		// digging empty cells
+		auto try_dig_one = [this] () -> bool {
+			int r = std::rand() % span_, c = std::rand() % span_;
+			if(get(r, c) == 0) return false;
+			reset(r, c);
+			return true;
+		};
+
+		for(int i = 0; i < empty_cells; i += try_dig_one());
+
+		// TODO: level selection
 		return true;
 	};
 
-	for(int count = 0; count < init_cells; count += try_random_one());
-	*this = solve();
-
-	// random exchange row/column/value
-	random_exchange(30);
-
-	// digging empty cells
-	auto try_dig_one = [this] () -> bool {
-		int r = std::rand() % span_, c = std::rand() % span_;
-		if(get(r, c) == 0) return false;
-		reset(r, c);
-		return true;
-	};
-
-	for(int i = 0; i < empty_cells; i += try_dig_one());
-
-	// TODO: level selection
+	while(!try_random());
 }

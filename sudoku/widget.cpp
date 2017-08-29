@@ -33,16 +33,30 @@ Widget::Widget(QWidget *parent) :
 		digit_btns.push_back(btn);
 	}
 
+	timer = new Timer;
+
 	start_btn = new QPushButton("Start");
 	connect(start_btn, SIGNAL(clicked()), grid, SLOT(game_start()));
+	connect(start_btn, SIGNAL(clicked()), timer, SLOT(restart_timer()));
 
 	pause_btn = new QPushButton("Pause");
+	connect(pause_btn, SIGNAL(clicked()), timer, SLOT(toggle_timer()));
+	connect(pause_btn, SIGNAL(clicked()), this, SLOT(toggle_button()));
+
+	hint_btn = new QPushButton("Hint");
+	connect(hint_btn, SIGNAL(clicked()), grid, SLOT(game_hint()));
 
 	button_layout->addWidget(start_btn);
 	button_layout->addWidget(pause_btn);
+	button_layout->addWidget(hint_btn);
+	button_layout->addWidget(timer);
 }
 
 Widget::~Widget()
 {
 	delete ui;
+}
+
+void Widget::toggle_button()
+{
 }

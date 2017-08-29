@@ -188,3 +188,11 @@ int SudokuCell::get_initial_status() const
 {
 	return initial_status;
 }
+
+
+void SudokuCell::set_hint_value(int v)
+{
+	emit selected_signal(this);
+	fill(candidates.begin(), candidates.end(), 0);
+	add_value(v);
+}

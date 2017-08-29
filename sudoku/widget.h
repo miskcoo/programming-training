@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <vector>
 #include "sudoku_grid.h"
+#include "timer.h"
 
 namespace Ui {
 class Widget;
@@ -17,13 +18,17 @@ public:
 	explicit Widget(QWidget *parent = 0);
 	~Widget();
 
+public slots:
+	void toggle_button();
+
 private:
 	Ui::Widget *ui;
 	QVBoxLayout *layout;
 	QHBoxLayout *button_layout;
 	std::vector<QPushButton*> digit_btns;
-	QPushButton *start_btn, *pause_btn;
+	QPushButton *start_btn, *pause_btn, *hint_btn;
 	SudokuGrid *grid;
+	Timer *timer;
 };
 
 #endif // WIDGET_H

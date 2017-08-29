@@ -99,11 +99,43 @@ void SudokuGrid::remove_value(int v)
 void SudokuGrid::game_start()
 {
 	// TODO: Level selection
-	sudoku->random_sudoku(11, 50, 0);
+	if(current_selected)
+		current_selected->free_selection();
+
+	Sudoku new_sudoku = *sudoku;
+	new_sudoku.random_sudoku(11, 50, 0);
+	*sudoku = new_sudoku;
+
 	for(int r = 0; r != cell_span; ++r)
 		for(int c = 0; c != cell_span; ++c)
 		{
 			int id = r * cell_span + c;
 			cells[id]->set_initial_status(sudoku->get(r, c));
 		}
+}
+
+
+void SudokuGrid::game_hint()
+{
+	Sudoku hint_sudoku = sudoku->solve();
+	if(hint_sudoku.is_empty())
+	{
+		QMessageBox::warning(this, "No Solution!", "Your current status leads to no solution.");
+	} else {
+		IntList empty_cells;
+		for(int r = 0; r != cell_span; ++r)
+			for(int c = 0; c != cell_span; ++c)
+				if(sudoku->get(r, c) == 0)
+					empty_cells.push_back(r * cell_span + c);
+
+		if(empty_cells.empty())
+		{
+			// already solved
+			return;
+		}
+
+		int id = empty_cells[std::rand() % empty_cells.size()];
+		int r = id / cell_span, c = id % cell_span;
+		cells[id]->set_hint_value(hint_sudoku.get(r, c));
+	}
 }

@@ -15,6 +15,8 @@ public:
 	void set_initial_status(int v);
 	int get_initial_status() const;
 
+	void set_hint_value(int v);
+
 signals:
 	void selected_signal(SudokuCell*);
 	void free_signal();
