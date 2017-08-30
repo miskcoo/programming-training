@@ -6,15 +6,22 @@
 
 struct ActionInfo
 {
-	IntList candidates;
-	int row, col, value;
+	int row, col;
+	bool value_settled_old, value_settled_new;
+	IntList candidates_old, candidates_new;
+
+	ActionInfo() : row(-1), col(-1) {}
 };
 
 class ActionQueue
 {
 public:
 	ActionQueue(int max_queue);
-	void add_action(int row, int col, int value, IntList candidates = {});
+	void add_action(
+		int row, int col,
+		bool value_settled_old, IntList candidates_old,
+		bool value_settled_new, IntList candidates_new
+	);
 	ActionInfo forward();
 	ActionInfo backward();
 	bool is_forwardable() const;

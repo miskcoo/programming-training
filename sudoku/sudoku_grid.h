@@ -30,7 +30,7 @@ public slots:
 
 	void backward_step();
 	void forward_step();
-	void value_changed(int r, int c, int v, IntList candidates = {});
+	void value_changed(int, int, bool, IntList, bool, IntList);
 
 	void light_value();
 	void free_selection();

@@ -54,10 +54,10 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 			connect(cell, SIGNAL(selected_signal(SudokuCell*)),
 					this, SLOT(light_value()));
 
-			connect(cell, SIGNAL(value_changed(int,int,int, IntList)),
-					this, SLOT(value_changed(int,int,int, IntList)));
+			connect(cell, SIGNAL(value_changed(int,int,bool,IntList,bool,IntList)),
+					this, SLOT(value_changed(int,int,bool,IntList,bool,IntList)));
 
-			connect(cell, SIGNAL(value_changed(int,int,int, IntList)),
+			connect(cell, SIGNAL(value_changed(int,int,bool,IntList,bool,IntList)),
 					this, SLOT(light_value()));
 
 			connect(cell, SIGNAL(free_signal()),
@@ -166,9 +166,14 @@ void SudokuGrid::clear_grid()
 		current_selected->clear_values();
 }
 
-void SudokuGrid::value_changed(int r, int c, int v, IntList candidates)
+void SudokuGrid::value_changed(
+	int r, int c,
+	bool value_settled_old, IntList candidates_old,
+	bool value_settled_new, IntList candidates_new)
 {
-	actions.add_action(r, c, v, candidates);
+	actions.add_action(r, c,
+			value_settled_old, candidates_old,
+			value_settled_new, candidates_new);
 }
 
 void SudokuGrid::backward_step()
@@ -179,17 +184,7 @@ void SudokuGrid::backward_step()
 		return;
 
 	int id = action.row * cell_span + action.col;
-	if(action.value < 0)
-	{
-		cells[id]->add_value(-action.value, false);
-	} else if(action.value == 0) {
-		for(int v = 1; v <= cell_span; ++v)
-			if(action.candidates[v])
-				cells[id]->add_value(v, false);
-	} else {
-		cells[id]->remove_value(action.value, false);
-	}
-
+	cells[id]->recover_status(action.value_settled_old, action.candidates_old);
 	cells[id]->emit_selected_signal();
 }
 
@@ -201,15 +196,7 @@ void SudokuGrid::forward_step()
 		return;
 
 	int id = action.row * cell_span + action.col;
-	if(action.value > 0)
-	{
-		cells[id]->add_value(action.value, false);
-	} else if(action.value == 0) {
-		cells[id]->clear_values(false);
-	} else {
-		cells[id]->remove_value(-action.value, false);
-	}
-
+	cells[id]->recover_status(action.value_settled_new, action.candidates_new);
 	cells[id]->emit_selected_signal();
 }
 
@@ -234,6 +221,9 @@ void SudokuGrid::free_selection()
 			cells[row * cell_span + i]->free_selection();
 			cells[i * cell_span + col]->free_selection();
 		}
+
+		for(SudokuCell* cell : cells)
+			cell->light_value(0);
 	}
 
 	current_selected = nullptr;

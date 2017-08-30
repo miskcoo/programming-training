@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cmath>
 #include "sudoku_cell.h"
+#include "utils.h"
 #include "config.h"
 
 SudokuCell::SudokuCell(int row, int col, std::shared_ptr<Sudoku> sudoku, QWidget *parent)
@@ -41,40 +42,53 @@ void SudokuCell::free_selection()
 void SudokuCell::add_value(int v, bool emit_signal)
 {
 	int span = sudoku->span();
-	if(1 <= v && v <= span && !candidates[v])
+	if(1 <= v && v <= span && !(!value_settled && candidates[v]))
 	{
+		IntList old_candidates = candidates;
+		bool old_value_settled = value_settled;
 		value_settled = false;
 		candidates[v] = 1;
+		is_lighted = false;
+		update_style();
 		update_text();
 		if(emit_signal)
-			emit value_changed(row, col, v);
+			emit value_changed(row, col,
+					old_value_settled, old_candidates,
+					value_settled, candidates);
 	}
 }
 
 void SudokuCell::set_value(int v, bool emit_signal)
 {
 	int span = sudoku->span();
-	if(1 <= v && v <= span)
+	if(1 <= v && v <= span && !(value_settled && candidates[v]))
 	{
+		bool old_value_settled = value_settled;
 		value_settled = true;
 		IntList old_candidates = candidates;
 		std::fill(candidates.begin(), candidates.end(), 0);
 		candidates[v] = 1;
 		update_text();
 		if(emit_signal)
-			emit value_changed(row, col, v, old_candidates);
+			emit value_changed(row, col,
+					old_value_settled, old_candidates,
+					value_settled, candidates);
 	}
 }
 
 void SudokuCell::remove_value(int v, bool emit_signal)
 {
+	IntList old_candidates = candidates;
+
 	int span = sudoku->span();
 	if(1 <= v && v <= span && candidates[v])
 	{
 		candidates[v] = 0;
 		update_text();
 		if(emit_signal)
-			emit value_changed(row, col, -v);
+			emit value_changed(row, col,
+					value_settled, old_candidates,
+					value_settled, candidates);
 	} else if(v == -1) {
 		for(int i = span; i; --i)
 			if(candidates[i])
@@ -82,7 +96,9 @@ void SudokuCell::remove_value(int v, bool emit_signal)
 				candidates[i] = 0;
 				update_text();
 				if(emit_signal)
-					emit value_changed(row, col, -i);
+					emit value_changed(row, col,
+							value_settled, old_candidates,
+							value_settled, candidates);
 				break;
 			}
 	}
@@ -112,47 +128,12 @@ void SudokuCell::update_style()
 
 void SudokuCell::update_font()
 {
-	/* This function is modified from
-	 * https://stackoverflow.com/questions/42652738/how-to-automatically-increase-decrease-text-size-in-label-in-qt
-	 */
-
-	// get initial settings
 	QString text = this->text();
-	if(text.length() == 0)
-		return;
-
 	QRect rect_lbl = geometry().adjusted(5, 5, -5, -5);
 	QFont font = this->font();
-	int size = font.pointSize();
-	QFontMetrics fm(font);
-	QRect rect = fm.boundingRect(rect_lbl, Qt::TextWordWrap, text);
 
-	// decide whether to increase or decrease
-	int step = rect.height() > rect_lbl.height() ? -1 : 1;
+	font = fit_font_with_text(font, text, rect_lbl);
 
-	// iterate until text fits best into rectangle of label
-	for (;;)
-	{
-		font.setPointSize(size + step);
-		QFontMetrics fm(font);
-		rect = fm.boundingRect(rect_lbl, Qt::TextWordWrap, text);
-		if (size <= 1)
-		{
-			// Font cannot be made smaller
-			break;
-		}
-		if (step < 0)
-		{
-			size += step;
-			if (rect.height() < rect_lbl.height()) break;
-		} else {
-			if (rect.height() > rect_lbl.height()) break;
-			size += step;
-		}
-	}
-
-	// apply result of iteration
-	font.setPointSize(size);
 	setFont(font);
 }
 
@@ -254,7 +235,6 @@ void SudokuCell::set_initial_status(int v)
 	if(v) set_value(v);
 	else update_text();
 
-
 	update_style();
 	set_mark(false);
 }
@@ -279,7 +259,9 @@ void SudokuCell::clear_values(bool emit_signal)
 	update_style();
 
 	if(emit_signal)
-		emit value_changed(row, col, 0, old_candidates);
+		emit value_changed(row, col,
+				value_settled, old_candidates,
+				value_settled, candidates);
 }
 
 IntList SudokuCell::get_candidates() const
@@ -313,4 +295,12 @@ int SudokuCell::get_value() const
 	if(value_settled && count(candidates.begin(), candidates.end(), 1) == 1)
 		return std::find(candidates.begin(), candidates.end(), 1) - candidates.begin();
 	return 0;
+}
+
+void SudokuCell::recover_status(bool value_settled, IntList candidates)
+{
+	this->value_settled = value_settled;
+	this->candidates = candidates;
+	update_text();
+	update_style();
 }

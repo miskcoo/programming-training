@@ -54,6 +54,7 @@ Widget::Widget(QWidget *parent) :
 
 		btn->setText(QString::number(i));
 		btn->setFixedSize(fixed_size, fixed_size);
+		btn->update_font();
 
 		m_l->setMapping(btn, i);
 		m_r->setMapping(btn, i);

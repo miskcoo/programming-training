@@ -20,8 +20,9 @@ SOURCES += main.cpp\
 		sudoku_grid.cpp \
 		sudoku_cell.cpp \
 		timer.cpp \
-		action_queue.cpp \  
-    digit_button.cpp
+		action_queue.cpp \ 
+		digit_button.cpp \
+		utils.cpp
 
 HEADERS  += widget.h \
 		utils.h \
@@ -32,6 +33,7 @@ HEADERS  += widget.h \
 		timer.h \
 		action_queue.h \
 		config.h \
-    digit_button.h
+		digit_button.h 
+
 
 FORMS	+= widget.ui

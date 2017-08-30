@@ -31,10 +31,12 @@ public:
 	int get_row() const { return row; }
 	int get_col() const { return col; }
 
+	void recover_status(bool value_settled, IntList candidates);
+
 signals:
 	void selected_signal(SudokuCell*);
 	void free_signal();
-	void value_changed(int r, int w, int v, IntList candidates = {});
+	void value_changed(int, int, bool, IntList, bool, IntList);
 
 public slots:
 	void vertical_selected();

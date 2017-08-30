@@ -9,6 +9,8 @@ class DigitButton : public QPushButton
 public:
 	explicit DigitButton(QWidget *parent = 0);
 
+	void update_font();
+
 signals:
 	void right_clicked();
 

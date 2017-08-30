@@ -5,13 +5,18 @@ ActionQueue::ActionQueue(int max_queue)
 {
 }
 
-void ActionQueue::add_action(int r, int c, int v, IntList candidates)
+void ActionQueue::add_action(
+	int row, int col,
+	bool value_settled_old, IntList candidates_old,
+	bool value_settled_new, IntList candidates_new)
 {
 	ActionInfo action;
-	action.row = r;
-	action.col = c;
-	action.value = v;
-	action.candidates = candidates;
+	action.row = row;
+	action.col = col;
+	action.candidates_new = candidates_new;
+	action.candidates_old = candidates_old;
+	action.value_settled_new = value_settled_new;
+	action.value_settled_old = value_settled_old;
 
 	actions.erase(actions.begin() + cur_pos, actions.end());
 	actions.push_back(action);
@@ -26,14 +31,14 @@ ActionInfo ActionQueue::forward()
 {
 	if(is_forwardable())
 		return actions[cur_pos++];
-	return { {}, -1, -1, -1 };
+	return ActionInfo();
 }
 
 ActionInfo ActionQueue::backward()
 {
 	if(is_backwardable())
 		return actions[--cur_pos];
-	return { {}, -1, -1, -1 };
+	return ActionInfo();
 }
 
 bool ActionQueue::is_forwardable() const
