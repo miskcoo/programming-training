@@ -5,6 +5,7 @@
 #include <vector>
 #include "sudoku_grid.h"
 #include "digit_button.h"
+#include "tool_button.h"
 #include "timer.h"
 
 namespace Ui {
@@ -21,6 +22,9 @@ public:
 
 public slots:
 	void toggle_button();
+	void set_backward_enable(bool);
+	void set_forward_enable(bool);
+	void game_start();
 
 private:
 	Ui::Widget *ui;
@@ -28,11 +32,13 @@ private:
 	QHBoxLayout *top_layout, *bottom_layout;
 	QGridLayout *digit_button_layout;
 	std::vector<DigitButton*> digit_btns;
-	QPushButton *start_btn, *pause_btn, *hint_btn;
-	QPushButton *clear_btn, *backward_btn, *forward_btn;
+	ToolButton *start_btn, *pause_btn, *hint_btn;
+	ToolButton *clear_btn, *backward_btn, *forward_btn;
 	QComboBox *level_combo;
 	SudokuGrid *grid;
 	Timer *timer;
+
+	bool is_paused;
 };
 
 #endif // WIDGET_H

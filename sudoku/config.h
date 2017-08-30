@@ -3,6 +3,7 @@
 
 #define CELL_SIZE  3
 #define FIXED_SIZE 50
+#define TOOL_FIXED_SIZE 30
 
 #define DEFAULT_TEXT_COLOR  "#222"
 #define DEFAULT_BG_COLOR    "white"

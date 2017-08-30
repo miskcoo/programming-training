@@ -116,7 +116,6 @@ void SudokuGrid::remove_value(int v)
 
 void SudokuGrid::game_start()
 {
-	// TODO: Level selection
 	if(current_selected)
 		free_selection();
 	current_selected = nullptr;
@@ -131,6 +130,8 @@ void SudokuGrid::game_start()
 		}
 
 	actions.reset();
+	emit set_forward_enable(false);
+	emit set_backward_enable(false);
 }
 
 
@@ -174,6 +175,9 @@ void SudokuGrid::value_changed(
 	actions.add_action(r, c,
 			value_settled_old, candidates_old,
 			value_settled_new, candidates_new);
+
+	emit set_backward_enable(actions.is_backwardable());
+	emit set_forward_enable(actions.is_forwardable());
 }
 
 void SudokuGrid::backward_step()
@@ -186,6 +190,9 @@ void SudokuGrid::backward_step()
 	int id = action.row * cell_span + action.col;
 	cells[id]->recover_status(action.value_settled_old, action.candidates_old);
 	cells[id]->emit_selected_signal();
+
+	emit set_backward_enable(actions.is_backwardable());
+	emit set_forward_enable(actions.is_forwardable());
 }
 
 void SudokuGrid::forward_step()
@@ -198,6 +205,9 @@ void SudokuGrid::forward_step()
 	int id = action.row * cell_span + action.col;
 	cells[id]->recover_status(action.value_settled_new, action.candidates_new);
 	cells[id]->emit_selected_signal();
+
+	emit set_backward_enable(actions.is_backwardable());
+	emit set_forward_enable(actions.is_forwardable());
 }
 
 void SudokuGrid::light_value()
@@ -232,5 +242,4 @@ void SudokuGrid::free_selection()
 void SudokuGrid::level_changed(int index)
 {
 	current_level = index + SUDOKU_LEVEL_MIN;
-	qDebug() << current_level;
 }

@@ -22,7 +22,8 @@ SOURCES += main.cpp\
 		timer.cpp \
 		action_queue.cpp \ 
 		digit_button.cpp \
-		utils.cpp
+		utils.cpp \
+    tool_button.cpp
 
 HEADERS  += widget.h \
 		utils.h \
@@ -33,7 +34,11 @@ HEADERS  += widget.h \
 		timer.h \
 		action_queue.h \
 		config.h \
-		digit_button.h 
+		digit_button.h \ 
+    tool_button.h
 
 
 FORMS	+= widget.ui
+
+RESOURCES += \
+    res.qrc

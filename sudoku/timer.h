@@ -18,6 +18,9 @@ public slots:
 	void timeout();
 
 private:
+	void set_time(QString);
+
+private:
 	QTimer *timer;
 	int clock_now;
 };

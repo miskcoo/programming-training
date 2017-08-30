@@ -5,7 +5,8 @@
 
 Widget::Widget(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::Widget)
+	ui(new Ui::Widget),
+	is_paused(false)
 {
 	ui->setupUi(this);
 
@@ -68,27 +69,40 @@ Widget::Widget(QWidget *parent) :
 	connect(m_r, SIGNAL(mapped(int)), grid, SLOT(add_value(int)));
 	connect(m_l, SIGNAL(mapped(int)), grid, SLOT(set_value(int)));
 
+	QHBoxLayout *timer_layout = new QHBoxLayout;
+	timer_layout->setContentsMargins(15, 5, 15, 5);
 	timer = new Timer;
+	ToolButton *clock_img = new ToolButton;
+	clock_img->set_image(":/icons/icons/alarm-clock.png");
+	clock_img->setFixedSize(18, 18);
 
-	start_btn = new QPushButton("Start");
-	connect(start_btn, SIGNAL(clicked()), grid, SLOT(game_start()));
+	start_btn = new ToolButton;
+	start_btn->set_image(":/icons/icons/restart.png");
+	connect(start_btn, SIGNAL(clicked()), this, SLOT(game_start()));
 	connect(start_btn, SIGNAL(clicked()), timer, SLOT(restart_timer()));
 
-	pause_btn = new QPushButton("Pause");
+	pause_btn = new ToolButton;
+	pause_btn->set_image(":/icons/icons/pause.png");
 	connect(pause_btn, SIGNAL(clicked()), timer, SLOT(toggle_timer()));
 	connect(pause_btn, SIGNAL(clicked()), this, SLOT(toggle_button()));
 
-	hint_btn = new QPushButton("Hint");
+	hint_btn = new ToolButton;
+	hint_btn->set_image(":/icons/icons/information.png");
 	connect(hint_btn, SIGNAL(clicked()), grid, SLOT(game_hint()));
 
-	clear_btn = new QPushButton("Clear");
+	clear_btn = new ToolButton;
+	clear_btn->set_image(":/icons/icons/eraser.png");
 	connect(clear_btn, SIGNAL(clicked()), grid, SLOT(clear_grid()));
 
-	backward_btn = new QPushButton("Backward");
+	backward_btn = new ToolButton;
+	backward_btn->set_image(":/icons/icons/back.png");
 	connect(backward_btn, SIGNAL(clicked()), grid, SLOT(backward_step()));
+	connect(grid, SIGNAL(set_backward_enable(bool)), this, SLOT(set_backward_enable(bool)));
 
-	forward_btn = new QPushButton("Forward");
+	forward_btn = new ToolButton;
+	forward_btn->set_image(":/icons/icons/next.png");
 	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
+	connect(grid, SIGNAL(set_forward_enable(bool)), this, SLOT(set_forward_enable(bool)));
 
 	level_combo = new QComboBox;
 	for(int i = SUDOKU_LEVEL_MIN; i <= SUDOKU_LEVEL_MAX; ++i)
@@ -101,8 +115,16 @@ Widget::Widget(QWidget *parent) :
 	top_layout->addWidget(clear_btn);
 	top_layout->addWidget(backward_btn);
 	top_layout->addWidget(forward_btn);
+
+	timer_layout->addWidget(clock_img);
+	timer_layout->addWidget(timer);
+	top_layout->addLayout(timer_layout);
+
 	top_layout->addWidget(level_combo);
-	top_layout->addWidget(timer);
+
+	// run the game
+	grid->game_start();
+	timer->restart_timer();
 }
 
 Widget::~Widget()
@@ -112,4 +134,24 @@ Widget::~Widget()
 
 void Widget::toggle_button()
 {
+	is_paused = !is_paused;
+	if(is_paused)
+		pause_btn->set_image(":/icons/icons/play.png");
+	else pause_btn->set_image(":/icons/icons/pause.png");
+}
+
+void Widget::set_backward_enable(bool enabled)
+{
+	backward_btn->setEnabled(enabled);
+}
+
+void Widget::set_forward_enable(bool enabled)
+{
+	forward_btn->setEnabled(enabled);
+}
+
+void Widget::game_start()
+{
+	if(is_paused) toggle_button();
+	grid->game_start();
 }

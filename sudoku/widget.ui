@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Widget</string>
+   <string>Sudoku</string>
   </property>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

@@ -17,6 +17,8 @@ public:
 	~SudokuGrid();
 
 signals:
+	void set_forward_enable(bool);
+	void set_backward_enable(bool);
 
 public slots:
 	void cell_selected(SudokuCell*);

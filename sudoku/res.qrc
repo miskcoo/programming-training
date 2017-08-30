@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/back.png</file>
+        <file>icons/eraser.png</file>
+        <file>icons/information.png</file>
+        <file>icons/next.png</file>
+        <file>icons/pause.png</file>
+        <file>icons/play.png</file>
+        <file>icons/question.png</file>
+        <file>icons/restart.png</file>
+        <file>icons/alarm-clock.png</file>
+    </qresource>
+</RCC>
