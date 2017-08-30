@@ -19,6 +19,7 @@ public:
 	IntList get_candidates() const;
 
 	void add_value(int v, bool emit_signal = true);
+	void set_value(int v, bool emit_signal = true);
 	void remove_value(int v, bool emit_signal = true);
 	void clear_values(bool emit_signal = true);
 
@@ -27,6 +28,8 @@ public:
 	void set_mark(bool);
 
 	int get_value() const;
+	int get_row() const { return row; }
+	int get_col() const { return col; }
 
 signals:
 	void selected_signal(SudokuCell*);
@@ -57,7 +60,7 @@ private:
 	bool is_lighted, is_marked;
 	bool is_vertical_selected, is_horizontal_selected;
 
-	int value_fixed;
+	int value_fixed, value_settled;
 	IntList candidates;
 };
 

@@ -47,6 +47,7 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 		for(int c = 0; c != cell_span; ++c)
 		{
 			SudokuCell *cell = cells[r * cell_span + c];
+
 			connect(cell, SIGNAL(selected_signal(SudokuCell*)),
 					this, SLOT(cell_selected(SudokuCell*)));
 
@@ -67,14 +68,8 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 				connect(cell, SIGNAL(selected_signal(SudokuCell*)),
 						cells[i * cell_span + c], SLOT(vertical_selected()));
 
-				if(i != r) connect(cell, SIGNAL(free_signal()),
-								   cells[i * cell_span + c], SLOT(free_selection()));
-
 				connect(cell, SIGNAL(selected_signal(SudokuCell*)),
 						cells[r * cell_span + i], SLOT(horizontal_selected()));
-
-				if(i != c) connect(cell, SIGNAL(free_signal()),
-								   cells[r * cell_span + i], SLOT(free_selection()));
 			}
 		}
 
@@ -83,7 +78,7 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 	top_layer->setMargin(GRID_SPACING);
 	setStyleSheet(QString("background-color: ") + GRID_BG_COLOR + ";");
 
-	int size = (fixed_size + 1) * cell_span + cell_size + GRID_SPACING;
+	int size = (fixed_size + 1) * cell_span + cell_size * GRID_SPACING;
 	setFixedSize(size, size);
 }
 
@@ -95,8 +90,7 @@ void SudokuGrid::cell_selected(SudokuCell *cell)
 {
 	if(cell != current_selected)
 	{
-		if(current_selected)
-			current_selected->free_selection();
+		free_selection();
 		current_selected = cell;
 	}
 }
@@ -105,6 +99,12 @@ void SudokuGrid::add_value(int v)
 {
 	if(current_selected)
 		current_selected->add_value(v);
+}
+
+void SudokuGrid::set_value(int v)
+{
+	if(current_selected)
+		current_selected->set_value(v);
 }
 
 void SudokuGrid::remove_value(int v)
@@ -117,7 +117,7 @@ void SudokuGrid::game_start()
 {
 	// TODO: Level selection
 	if(current_selected)
-		current_selected->free_selection();
+		free_selection();
 	current_selected = nullptr;
 
 	Sudoku new_sudoku = *sudoku;
@@ -225,5 +225,16 @@ void SudokuGrid::light_value()
 
 void SudokuGrid::free_selection()
 {
+	if(current_selected)
+	{
+		int row = current_selected->get_row(),
+			col = current_selected->get_col();
+		for(int i = 0; i != cell_span; ++i)
+		{
+			cells[row * cell_span + i]->free_selection();
+			cells[i * cell_span + col]->free_selection();
+		}
+	}
+
 	current_selected = nullptr;
 }

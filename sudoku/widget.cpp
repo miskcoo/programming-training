@@ -25,7 +25,7 @@ Widget::Widget(QWidget *parent) :
 
 	// init digit button layout
 	QLabel *digit_layout_wrap = new QLabel;
-	int size = (fixed_size + 1) * cell_span + GRID_SPACING + 1;
+	int size = (fixed_size + 1) * cell_span + 2 * (GRID_SPACING - 1) + 1;
 	digit_layout_wrap->setFixedSize(fixed_size + GRID_SPACING * 2, size);
 	digit_layout_wrap->setStyleSheet(
 		"QLabel { background-color: " GRID_BG_COLOR ";}"
@@ -46,21 +46,26 @@ Widget::Widget(QWidget *parent) :
 
 	bottom_layout->addWidget(digit_layout_wrap);
 
-	QSignalMapper *m = new QSignalMapper(this);
+	QSignalMapper *m_r = new QSignalMapper(this);
+	QSignalMapper *m_l = new QSignalMapper(this);
 	for(int i = 1; i <= cell_span; ++i)
 	{
-		QPushButton *btn = new QPushButton(QString::number(i));
+		DigitButton *btn = new DigitButton;
 
+		btn->setText(QString::number(i));
 		btn->setFixedSize(fixed_size, fixed_size);
 
-		m->setMapping(btn, i);
-		connect(btn, SIGNAL(clicked()), m, SLOT(map()));
+		m_l->setMapping(btn, i);
+		m_r->setMapping(btn, i);
+		connect(btn, SIGNAL(clicked()), m_l, SLOT(map()));
+		connect(btn, SIGNAL(right_clicked()), m_r, SLOT(map()));
 
 		digit_button_layout->addWidget(btn, i - 1, 0);
 		digit_btns.push_back(btn);
 	}
 
-	connect(m, SIGNAL(mapped(int)), grid, SLOT(add_value(int)));
+	connect(m_r, SIGNAL(mapped(int)), grid, SLOT(add_value(int)));
+	connect(m_l, SIGNAL(mapped(int)), grid, SLOT(set_value(int)));
 
 	timer = new Timer;
 

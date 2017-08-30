@@ -244,7 +244,7 @@ void Sudoku::random_exchange(int times)
 
 void Sudoku::random_sudoku(int init_cells, int empty_cells, int)
 {
-	auto try_random = [=, this] () -> bool {
+	auto try_random = [=] () -> bool {
 		clear();
 
 		// randomly fill `init_cells` cells

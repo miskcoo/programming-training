@@ -21,6 +21,7 @@ signals:
 public slots:
 	void cell_selected(SudokuCell*);
 	void add_value(int);
+	void set_value(int);
 	void remove_value(int);
 	void clear_grid();
 
