@@ -28,10 +28,11 @@ Widget::Widget(QWidget *parent) :
 
 		m->setMapping(btn, i);
 		connect(btn, SIGNAL(clicked()), m, SLOT(map()));
-		connect(m, SIGNAL(mapped(int)), grid, SLOT(add_value(int)));
 
 		digit_btns.push_back(btn);
 	}
+
+	connect(m, SIGNAL(mapped(int)), grid, SLOT(add_value(int)));
 
 	timer = new Timer;
 
@@ -46,9 +47,21 @@ Widget::Widget(QWidget *parent) :
 	hint_btn = new QPushButton("Hint");
 	connect(hint_btn, SIGNAL(clicked()), grid, SLOT(game_hint()));
 
+	clear_btn = new QPushButton("Clear");
+	connect(clear_btn, SIGNAL(clicked()), grid, SLOT(clear_grid()));
+
+	backward_btn = new QPushButton("Backward");
+	connect(backward_btn, SIGNAL(clicked()), grid, SLOT(backward_step()));
+
+	forward_btn = new QPushButton("Forward");
+	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
+
 	button_layout->addWidget(start_btn);
 	button_layout->addWidget(pause_btn);
 	button_layout->addWidget(hint_btn);
+	button_layout->addWidget(clear_btn);
+	button_layout->addWidget(backward_btn);
+	button_layout->addWidget(forward_btn);
 	button_layout->addWidget(timer);
 }
 

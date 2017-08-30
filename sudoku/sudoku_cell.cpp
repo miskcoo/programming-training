@@ -36,29 +36,35 @@ void SudokuCell::free_selection()
 	update_style();
 }
 
-void SudokuCell::add_value(int v)
+void SudokuCell::add_value(int v, bool emit_signal)
 {
 	int span = sudoku->span();
 	if(1 <= v && v <= span)
 	{
 		candidates[v] = 1;
 		update_text();
+		if(emit_signal)
+			emit value_changed(row, col, v);
 	}
 }
 
-void SudokuCell::remove_value(int v)
+void SudokuCell::remove_value(int v, bool emit_signal)
 {
 	int span = sudoku->span();
 	if(1 <= v && v <= span)
 	{
 		candidates[v] = 0;
 		update_text();
+		if(emit_signal)
+			emit value_changed(row, col, -v);
 	} else if(v == -1) {
 		for(int i = span; i; --i)
 			if(candidates[i])
 			{
 				candidates[i] = 0;
 				update_text();
+				if(emit_signal)
+					emit value_changed(row, col, -i);
 				break;
 			}
 	}
@@ -195,4 +201,20 @@ void SudokuCell::set_hint_value(int v)
 	emit selected_signal(this);
 	fill(candidates.begin(), candidates.end(), 0);
 	add_value(v);
+}
+
+void SudokuCell::clear_values(bool emit_signal)
+{
+	IntList old_candidates = candidates;
+	fill(candidates.begin(), candidates.end(), 0);
+	update_text();
+	update_style();
+
+	if(emit_signal)
+		emit value_changed(row, col, 0, old_candidates);
+}
+
+IntList SudokuCell::get_candidates() const
+{
+	return candidates;
 }

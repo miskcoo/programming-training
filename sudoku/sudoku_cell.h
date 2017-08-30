@@ -16,18 +16,21 @@ public:
 	int get_initial_status() const;
 
 	void set_hint_value(int v);
+	IntList get_candidates() const;
+
+	void add_value(int v, bool emit_signal = true);
+	void remove_value(int v, bool emit_signal = true);
+	void clear_values(bool emit_signal = true);
 
 signals:
 	void selected_signal(SudokuCell*);
 	void free_signal();
+	void value_changed(int r, int w, int v, IntList candidates = {});
 
 public slots:
 	void vertical_selected();
 	void horizontal_selected();
 	void free_selection();
-
-	void add_value(int v);
-	void remove_value(int v);
 
 protected:
 	void mousePressEvent(QMouseEvent*);

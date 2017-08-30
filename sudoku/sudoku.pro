@@ -18,15 +18,17 @@ SOURCES += main.cpp\
 		sudoku.cpp \
 		dancing_link.cpp \
 		sudoku_grid.cpp \
-	sudoku_cell.cpp \
-    timer.cpp
+		sudoku_cell.cpp \
+		timer.cpp \
+		action_queue.cpp 
 
 HEADERS  += widget.h \
 		utils.h \
 		sudoku.h \
 		dancing_link.h \
 		sudoku_grid.h \
-	sudoku_cell.h \
-    timer.h
+		sudoku_cell.h \
+		timer.h \
+		action_queue.h
 
 FORMS	+= widget.ui

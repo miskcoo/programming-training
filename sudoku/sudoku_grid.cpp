@@ -6,7 +6,8 @@ SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
 	  cell_span(cell_size * cell_size),
 	  fixed_size(50),
 	  current_selected(nullptr),
-	  sudoku(std::make_shared<Sudoku>(cell_size))
+	  sudoku(std::make_shared<Sudoku>(cell_size)),
+	  actions(10)
 {
 	// init cells
 	top_layer = new QGridLayout(this);
@@ -45,6 +46,10 @@ SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
 			SudokuCell *cell = cells[r * cell_span + c];
 			connect(cell, SIGNAL(selected_signal(SudokuCell*)),
 					this, SLOT(cell_selected(SudokuCell*)));
+
+			connect(cell, SIGNAL(value_changed(int,int,int, IntList)),
+					this, SLOT(value_changed(int,int,int, IntList)));
+
 			for(int i = 0; i != cell_span; ++i)
 			{
 				connect(cell, SIGNAL(selected_signal(SudokuCell*)),
@@ -137,5 +142,54 @@ void SudokuGrid::game_hint()
 		int id = empty_cells[std::rand() % empty_cells.size()];
 		int r = id / cell_span, c = id % cell_span;
 		cells[id]->set_hint_value(hint_sudoku.get(r, c));
+	}
+}
+
+void SudokuGrid::clear_grid()
+{
+	if(current_selected)
+		current_selected->clear_values();
+}
+
+void SudokuGrid::value_changed(int r, int c, int v, IntList candidates)
+{
+	actions.add_action(r, c, v, candidates);
+}
+
+void SudokuGrid::backward_step()
+{
+	ActionInfo action = actions.backward();
+
+	if(action.row < 0)
+		return;
+
+	int id = action.row * cell_span + action.col;
+	if(action.value < 0)
+	{
+		cells[id]->add_value(-action.value, false);
+	} else if(action.value == 0) {
+		for(int v = 1; v <= cell_span; ++v)
+			if(action.candidates[v])
+				cells[id]->add_value(v, false);
+	} else {
+		cells[id]->remove_value(action.value, false);
+	}
+}
+
+void SudokuGrid::forward_step()
+{
+	ActionInfo action = actions.forward();
+
+	if(action.row < 0)
+		return;
+
+	int id = action.row * cell_span + action.col;
+	if(action.value > 0)
+	{
+		cells[id]->add_value(action.value, false);
+	} else if(action.value == 0) {
+		cells[id]->clear_values(false);
+	} else {
+		cells[id]->remove_value(-action.value, false);
 	}
 }

@@ -27,6 +27,7 @@ private:
 	QHBoxLayout *button_layout;
 	std::vector<QPushButton*> digit_btns;
 	QPushButton *start_btn, *pause_btn, *hint_btn;
+	QPushButton *clear_btn, *backward_btn, *forward_btn;
 	SudokuGrid *grid;
 	Timer *timer;
 };
