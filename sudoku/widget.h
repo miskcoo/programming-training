@@ -30,6 +30,7 @@ private:
 	std::vector<DigitButton*> digit_btns;
 	QPushButton *start_btn, *pause_btn, *hint_btn;
 	QPushButton *clear_btn, *backward_btn, *forward_btn;
+	QComboBox *level_combo;
 	SudokuGrid *grid;
 	Timer *timer;
 };

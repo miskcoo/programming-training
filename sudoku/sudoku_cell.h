@@ -15,7 +15,6 @@ public:
 	void set_initial_status(int v);
 	int get_initial_status() const;
 
-	void set_hint_value(int v);
 	IntList get_candidates() const;
 
 	void add_value(int v, bool emit_signal = true);

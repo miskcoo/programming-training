@@ -1,6 +1,7 @@
 #ifndef DANCING_LINK_H
 #define DANCING_LINK_H
 #include "utils.h"
+#include <functional>
 
 class DancingLink
 {
@@ -20,11 +21,11 @@ public:
 	// cols must be sorted ascending
 	int append_row(const IntList& cols);
 	IntList solve();
-
+	bool solve_unique(IntList&);
 private:
 	void remove(int col);
 	void restore(int col);
-	int dfs(int level);
+	int dfs(int level, const std::function<bool()>& callback);
 };
 
 #endif // DANCING_LINK_H

@@ -3,6 +3,13 @@
 
 #include "utils.h"
 
+#define DIGGING_RANDOM 0
+#define DIGGING_S 1
+#define DIGGING_Z 2
+
+#define SUDOKU_LEVEL_MIN 1
+#define SUDOKU_LEVEL_MAX 10
+
 class Sudoku
 {
 	int size_, span_;
@@ -29,7 +36,7 @@ public:
 	// get available candidate numbers of (x, y)
 	IntList get_available(int x, int y) const;
 	// solve this sudoku puzzle
-	Sudoku solve() const;
+	Sudoku solve(bool check_unique = false, bool* is_unique = nullptr) const;
 	// get span
 	int span() const;
 
@@ -38,7 +45,15 @@ public:
 	void exchange_row(int r1, int r2);
 	void exchange_column(int c1, int c2);
 	void random_exchange(int times);
-	void random_sudoku(int init_cells, int empty_cells, int lower_bound);
+	void random_sudoku(
+		int init_cells,
+		int empty_cells_lb,
+		int line_lb,
+		bool is_unique = true,
+		int digging_seq_type = DIGGING_Z
+	);
+
+	static Sudoku generate(int size, int level);
 private:
 	bool _check_coord(int x, int y) const;
 };

@@ -90,12 +90,18 @@ Widget::Widget(QWidget *parent) :
 	forward_btn = new QPushButton("Forward");
 	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
 
+	level_combo = new QComboBox;
+	for(int i = SUDOKU_LEVEL_MIN; i <= SUDOKU_LEVEL_MAX; ++i)
+		level_combo->addItem(QString::number(i));
+	connect(level_combo, SIGNAL(currentIndexChanged(int)), grid, SLOT(level_changed(int)));
+
 	top_layout->addWidget(start_btn);
 	top_layout->addWidget(pause_btn);
 	top_layout->addWidget(hint_btn);
 	top_layout->addWidget(clear_btn);
 	top_layout->addWidget(backward_btn);
 	top_layout->addWidget(forward_btn);
+	top_layout->addWidget(level_combo);
 	top_layout->addWidget(timer);
 }
 

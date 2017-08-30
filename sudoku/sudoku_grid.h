@@ -31,11 +31,13 @@ public slots:
 	void backward_step();
 	void forward_step();
 	void value_changed(int, int, bool, IntList, bool, IntList);
+	void level_changed(int);
 
 	void light_value();
 	void free_selection();
 
 private:
+	int current_level;
 	int cell_size, cell_span, fixed_size;
 	QGridLayout *top_layer;
 	SudokuCell *current_selected;

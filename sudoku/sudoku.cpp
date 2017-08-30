@@ -147,7 +147,7 @@ IntList Sudoku::get_available(int x, int y) const
 	return avail;
 }
 
-Sudoku Sudoku::solve() const
+Sudoku Sudoku::solve(bool check_unique, bool *is_unique) const
 {
 	int span2 = span_ * span_;
 	int row_num = span2 * span_;
@@ -177,7 +177,10 @@ Sudoku Sudoku::solve() const
 		}
 	}
 
-	IntList dlx_rows = dlx.solve();
+	IntList dlx_rows;
+	if(!check_unique)
+		dlx_rows = dlx.solve();
+	else *is_unique = dlx.solve_unique(dlx_rows);
 	Sudoku ans = *this;
 
 	for(int row : dlx_rows)
@@ -194,7 +197,7 @@ Sudoku Sudoku::solve() const
 
 void Sudoku::exchange_column(int c1, int c2)
 {
-	if(0 <= c1 && c1 < span_ && 0 <= c2 && c2 <= span_)
+	if(0 <= c1 && c1 < span_ && 0 <= c2 && c2 < span_)
 	{
 		for(int r = 0; r != span_; ++r)
 			std::swap(grids_[r * span_ + c1], grids_[r * span_ + c2]);
@@ -203,7 +206,7 @@ void Sudoku::exchange_column(int c1, int c2)
 
 void Sudoku::exchange_row(int r1, int r2)
 {
-	if(0 <= r1 && r1 < span_ && 0 <= r2 && r2 <= span_)
+	if(0 <= r1 && r1 < span_ && 0 <= r2 && r2 < span_)
 	{
 		for(int c = 0; c != span_; ++c)
 			std::swap(grids_[r1 * span_ + c], grids_[r2 * span_ + c]);
@@ -226,25 +229,37 @@ void Sudoku::random_exchange(int times)
 {
 	for(int i = 0; i != times; ++i)
 	{
-		int type = std::rand() % 3;
+		int type = std::rand() % 5;
 		if(type == 0)
 		{
 			int v1 = std::rand() % span_ + 1;
 			int v2 = std::rand() % span_ + 1;
 			exchange_number(v1, v2);
-		} else {
+		} else if(type == 1 || type == 2) {
 			int l = std::rand() % size_ * size_;
 			int l1 = l + std::rand() % size_;
 			int l2 = l + std::rand() % size_;
 			if(type == 1) exchange_row(l1, l2);
 			else exchange_column(l1, l2);
+		} else {
+			int l1 = std::rand() % size_ * size_;
+			int l2 = std::rand() % size_ * size_;
+			for(int i = 0; i != size_; ++i)
+				if(type == 3) exchange_row(l1 + i, l2 + i);
+				else exchange_column(l1 + i, l2 + i);
 		}
 	}
 }
 
-void Sudoku::random_sudoku(int init_cells, int empty_cells, int)
+void Sudoku::random_sudoku(
+	int init_cells,
+	int empty_cells_lb,
+	int line_lb,
+	bool is_unique,
+	int digging_seq_type)
 {
-	auto try_random = [=] () -> bool {
+	int span2 = span_ * span_;
+	auto try_random = [=] () -> int {
 		clear();
 
 		// randomly fill `init_cells` cells
@@ -258,25 +273,138 @@ void Sudoku::random_sudoku(int init_cells, int empty_cells, int)
 		};
 
 		for(int count = 0; count < init_cells; count += try_random_one());
+
+		// generate a valid solution
 		*this = solve();
-		if(is_empty()) return false;
+		if(is_empty()) return 0;
 
 		// random exchange row/column/value
 		random_exchange(30);
 
+		// generate digging sequence
+		IntList digging_seq;
+
+		switch(digging_seq_type)
+		{
+		case DIGGING_RANDOM:
+			for(int i = 0; i != span2; ++i)
+				digging_seq.push_back(i);
+			std::random_shuffle(digging_seq.begin(), digging_seq.end());
+			break;
+		case DIGGING_S:
+			for(int r = 0; r != span_; ++r)
+				for(int c = 0; c != span_; ++c)
+				{
+					int nc = (r & 1) ? span_ - c - 1 : c;
+					digging_seq.push_back(r * span_ + nc);
+				}
+			break;
+		case DIGGING_Z:
+			for(int i = 0; i != span2; ++i)
+				digging_seq.push_back(i);
+			break;
+		}
+
+		// random peturb digging sequence
+		for(int i = 0; i != span_; ++i)
+			std::swap(digging_seq[std::rand() % span2], digging_seq[std::rand() % span2]);
+
 		// digging empty cells
-		auto try_dig_one = [this] () -> bool {
-			int r = std::rand() % span_, c = std::rand() % span_;
-			if(get(r, c) == 0) return false;
-			reset(r, c);
-			return true;
+		auto try_dig_one = [=] (int pos) -> bool {
+			int r = pos / span_, c = pos % span_;
+			int cnt_r = 0, cnt_c = 0;
+			for(int i = 0; i != span_; ++i)
+			{
+				if(get(r, i)) ++cnt_c;
+				if(get(i, c)) ++cnt_r;
+			}
+
+			if(cnt_r <= line_lb || cnt_c <= line_lb)
+				return false;
+
+			if(is_unique)
+			{
+				Sudoku new_sudoku = *this;
+				new_sudoku.reset(r, c);
+
+				bool uniqueness;
+				new_sudoku = new_sudoku.solve(true, &uniqueness);
+
+				if(uniqueness)
+					this->reset(r, c);
+				return uniqueness;
+			} else {
+				this->reset(r, c);
+				return true;
+			}
 		};
 
-		for(int i = 0; i < empty_cells; i += try_dig_one());
+		int dig_num = 0;
+		for(int pos : digging_seq)
+		{
+			dig_num += try_dig_one(pos);
+			if(dig_num >= empty_cells_lb)
+				break;
+		}
 
-		// TODO: level selection
-		return true;
+		return dig_num;
 	};
 
-	while(!try_random());
+	while(try_random() < empty_cells_lb);
+	random_exchange(50);
+}
+
+Sudoku Sudoku::generate(int size, int level)
+{
+	int given = 81, lb = 0, random_type = DIGGING_RANDOM;
+
+	switch(level)
+	{
+	case 1:
+		lb = 5;
+		given = 50 + std::rand() % 8;
+		break;
+	case 2:
+		lb = 4;
+		given = 50 + std::rand() % 5;
+		break;
+	case 3:
+		lb = 4;
+		given = 40 + std::rand() % 8;
+		break;
+	case 4:
+		lb = 4;
+		given = 36 + std::rand() % 6;
+		break;
+	case 5:
+		lb = 3;
+		given = 36 + std::rand() % 6;
+		break;
+	case 6:
+		lb = 3;
+		given = 28 + std::rand() % 3;
+		break;
+	case 7:
+		lb = 2;
+		given = 28 + std::rand() % 3;
+		break;
+	case 8:
+		lb = 2;
+		given = 22 + std::rand() % 5;
+		break;
+	case 9:
+		lb = 1;
+		random_type = DIGGING_S;
+		given = 22 + std::rand() % 3;
+		break;
+	case 10:
+		lb = 0;
+		random_type = DIGGING_Z;
+		given = 22 + std::rand() % 2;
+		break;
+	}
+
+	Sudoku ret(size);
+	ret.random_sudoku(11, ret.span() * ret.span() - given, lb, true, random_type);
+	return ret;
 }

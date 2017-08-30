@@ -4,6 +4,7 @@
 
 SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 	: QLabel(parent),
+	  current_level(1),
 	  cell_size(cell_size),
 	  cell_span(cell_size * cell_size),
 	  fixed_size(fixed_size),
@@ -120,9 +121,7 @@ void SudokuGrid::game_start()
 		free_selection();
 	current_selected = nullptr;
 
-	Sudoku new_sudoku = *sudoku;
-	new_sudoku.random_sudoku(11, 50, 0);
-	*sudoku = new_sudoku;
+	*sudoku = Sudoku::generate(cell_size, current_level);
 
 	for(int r = 0; r != cell_span; ++r)
 		for(int c = 0; c != cell_span; ++c)
@@ -156,7 +155,8 @@ void SudokuGrid::game_hint()
 
 		int id = empty_cells[std::rand() % empty_cells.size()];
 		int r = id / cell_span, c = id % cell_span;
-		cells[id]->set_hint_value(hint_sudoku.get(r, c));
+		cells[id]->emit_selected_signal();
+		cells[id]->set_value(hint_sudoku.get(r, c));
 	}
 }
 
@@ -227,4 +227,10 @@ void SudokuGrid::free_selection()
 	}
 
 	current_selected = nullptr;
+}
+
+void SudokuGrid::level_changed(int index)
+{
+	current_level = index + SUDOKU_LEVEL_MIN;
+	qDebug() << current_level;
 }

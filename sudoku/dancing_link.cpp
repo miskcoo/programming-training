@@ -78,12 +78,12 @@ void DancingLink::restore(int col)
 	R[L[col]] = col;
 }
 
-int DancingLink::dfs(int level)
+int DancingLink::dfs(int level, const std::function<bool()>& callback)
 {
 	if(R[0] == 0)
 	{
 		answer_num = level;
-		return 1;
+		return callback();
 	}
 
 	int min_node_in_col = R[0];
@@ -101,7 +101,7 @@ int DancingLink::dfs(int level)
 		answer[level] = belong_row[i];
 		for(int k = R[i]; k != i; k = R[k])
 			remove(belong_col[k]);
-		if(dfs(level + 1)) return 1;
+		if(dfs(level + 1, callback)) return 1;
 		for(int k = L[i]; k != i; k = L[k])
 			restore(belong_col[k]);
 	}
@@ -114,6 +114,22 @@ IntList DancingLink::solve()
 {
 	answer_num = 0;
 	answer.assign(row_num + 1, 0);
-	if(!dfs(0)) return {};
+	if(!dfs(0, []() { return true; })) return {};
 	return IntList(answer.begin(), answer.begin() + answer_num);
+}
+
+bool DancingLink::solve_unique(IntList& ans)
+{
+	int count = 0;
+	answer_num = 0;
+	answer.assign(row_num + 1, 0);
+	dfs(0, [&]() { return ++count > 1; });
+	if(count == 0)
+	{
+		ans = {};
+		return false;
+	} else {
+		ans = IntList(answer.begin(), answer.begin() + answer_num);
+		return count == 1;
+	}
 }

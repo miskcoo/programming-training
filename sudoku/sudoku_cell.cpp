@@ -244,13 +244,6 @@ int SudokuCell::get_initial_status() const
 	return initial_status;
 }
 
-void SudokuCell::set_hint_value(int v)
-{
-	emit_selected_signal();
-	fill(candidates.begin(), candidates.end(), 0);
-	add_value(v);
-}
-
 void SudokuCell::clear_values(bool emit_signal)
 {
 	IntList old_candidates = candidates;
