@@ -24,7 +24,8 @@ public slots:
 private:
 	Ui::Widget *ui;
 	QVBoxLayout *layout;
-	QHBoxLayout *button_layout;
+	QHBoxLayout *top_layout, *bottom_layout;
+	QGridLayout *digit_button_layout;
 	std::vector<QPushButton*> digit_btns;
 	QPushButton *start_btn, *pause_btn, *hint_btn;
 	QPushButton *clear_btn, *backward_btn, *forward_btn;

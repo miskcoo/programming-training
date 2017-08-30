@@ -19,6 +19,7 @@ public:
 	ActionInfo backward();
 	bool is_forwardable() const;
 	bool is_backwardable() const;
+	void reset();
 private:
 	int max_queue, cur_pos;
 	std::deque<ActionInfo> actions;

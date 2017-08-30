@@ -22,6 +22,12 @@ public:
 	void remove_value(int v, bool emit_signal = true);
 	void clear_values(bool emit_signal = true);
 
+	void emit_selected_signal();
+	void light_value(int);
+	void set_mark(bool);
+
+	int get_value() const;
+
 signals:
 	void selected_signal(SudokuCell*);
 	void free_signal();
@@ -37,6 +43,7 @@ protected:
 	void keyPressEvent(QKeyEvent*);
 	void focusInEvent(QFocusEvent*);
 	void focusOutEvent(QFocusEvent*);
+	void paintEvent(QPaintEvent*);
 
 private:
 	void update_text();
@@ -47,6 +54,7 @@ private:
 	int row, col, initial_status;
 	std::shared_ptr<Sudoku> sudoku;
 
+	bool is_lighted, is_marked;
 	bool is_vertical_selected, is_horizontal_selected;
 
 	int value_fixed;

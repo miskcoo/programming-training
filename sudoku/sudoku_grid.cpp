@@ -1,10 +1,12 @@
+#include <algorithm>
 #include "sudoku_grid.h"
+#include "config.h"
 
-SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
+SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 	: QLabel(parent),
 	  cell_size(cell_size),
 	  cell_span(cell_size * cell_size),
-	  fixed_size(50),
+	  fixed_size(fixed_size),
 	  current_selected(nullptr),
 	  sudoku(std::make_shared<Sudoku>(cell_size)),
 	  actions(10)
@@ -18,7 +20,7 @@ SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
 		{
 			QGridLayout *grid = new QGridLayout;
 			top_layer->addLayout(grid, r, c);
-			grid->setSpacing(1);
+			grid->setSpacing(CELL_SPACING);
 
 			for(int x = 0; x != cell_size; ++x)
 				for(int y = 0; y != cell_size; ++y)
@@ -29,6 +31,7 @@ SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
 					cell->setFocusPolicy(Qt::StrongFocus);
 					cell->setFixedSize(fixed_size, fixed_size);
 					// cell->setWordWrap(true);
+					cell->setTextFormat(Qt::PlainText);
 					cell->setAlignment(Qt::AlignCenter);
 
 					grid->addWidget(cell, x, y);
@@ -47,8 +50,17 @@ SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
 			connect(cell, SIGNAL(selected_signal(SudokuCell*)),
 					this, SLOT(cell_selected(SudokuCell*)));
 
+			connect(cell, SIGNAL(selected_signal(SudokuCell*)),
+					this, SLOT(light_value()));
+
 			connect(cell, SIGNAL(value_changed(int,int,int, IntList)),
 					this, SLOT(value_changed(int,int,int, IntList)));
+
+			connect(cell, SIGNAL(value_changed(int,int,int, IntList)),
+					this, SLOT(light_value()));
+
+			connect(cell, SIGNAL(free_signal()),
+					this, SLOT(free_selection()));
 
 			for(int i = 0; i != cell_span; ++i)
 			{
@@ -67,11 +79,11 @@ SudokuGrid::SudokuGrid(int cell_size, QWidget *parent)
 		}
 
 	// set layer style
-	top_layer->setSpacing(2);
-	top_layer->setMargin(2);
-	setStyleSheet("background-color: #666;");
+	top_layer->setSpacing(GRID_SPACING);
+	top_layer->setMargin(GRID_SPACING);
+	setStyleSheet(QString("background-color: ") + GRID_BG_COLOR + ";");
 
-	int size = (fixed_size + 1) * cell_span + cell_size + 2;
+	int size = (fixed_size + 1) * cell_span + cell_size + GRID_SPACING;
 	setFixedSize(size, size);
 }
 
@@ -106,6 +118,7 @@ void SudokuGrid::game_start()
 	// TODO: Level selection
 	if(current_selected)
 		current_selected->free_selection();
+	current_selected = nullptr;
 
 	Sudoku new_sudoku = *sudoku;
 	new_sudoku.random_sudoku(11, 50, 0);
@@ -117,6 +130,8 @@ void SudokuGrid::game_start()
 			int id = r * cell_span + c;
 			cells[id]->set_initial_status(sudoku->get(r, c));
 		}
+
+	actions.reset();
 }
 
 
@@ -174,6 +189,8 @@ void SudokuGrid::backward_step()
 	} else {
 		cells[id]->remove_value(action.value, false);
 	}
+
+	cells[id]->emit_selected_signal();
 }
 
 void SudokuGrid::forward_step()
@@ -192,4 +209,21 @@ void SudokuGrid::forward_step()
 	} else {
 		cells[id]->remove_value(-action.value, false);
 	}
+
+	cells[id]->emit_selected_signal();
+}
+
+void SudokuGrid::light_value()
+{
+	if(current_selected)
+	{
+		int value = current_selected->get_value();
+		for(SudokuCell* cell : cells)
+			cell->light_value(value);
+	}
+}
+
+void SudokuGrid::free_selection()
+{
+	current_selected = nullptr;
 }

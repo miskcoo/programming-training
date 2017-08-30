@@ -1,7 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include "sudoku_grid.h"
-
+#include "config.h"
 
 Widget::Widget(QWidget *parent) :
 	QWidget(parent),
@@ -9,26 +9,54 @@ Widget::Widget(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	layout = new QVBoxLayout(this);
-
-	int cell_size = 3;
+	int fixed_size = FIXED_SIZE;
+	int cell_size = CELL_SIZE;
 	int cell_span = cell_size * cell_size;
 
-	grid = new SudokuGrid(cell_size);
-	layout->addWidget(grid);
+	layout = new QVBoxLayout(this);
+	top_layout = new QHBoxLayout;
+	bottom_layout = new QHBoxLayout;
 
-	button_layout = new QHBoxLayout;
-	layout->addLayout(button_layout);
+	layout->addLayout(top_layout);
+	layout->addLayout(bottom_layout);
+
+	grid = new SudokuGrid(cell_size, fixed_size);
+	bottom_layout->addWidget(grid);
+
+	// init digit button layout
+	QLabel *digit_layout_wrap = new QLabel;
+	int size = (fixed_size + 1) * cell_span + GRID_SPACING + 1;
+	digit_layout_wrap->setFixedSize(fixed_size + GRID_SPACING * 2, size);
+	digit_layout_wrap->setStyleSheet(
+		"QLabel { background-color: " GRID_BG_COLOR ";}"
+		"QPushButton{ "
+				"border:none;"
+				"background-color: " DEFAULT_BG_COLOR "; }"
+		"QPushButton:pressed {"
+				"border:none;"
+				"background-color: " PRESSED_BG_COLOR "; }"
+		"QPushButton:hover:!pressed {"
+				"border:none;"
+				"background-color: " HOVER_BG_COLOR "; }"
+	);
+
+	digit_button_layout = new QGridLayout(digit_layout_wrap);
+	digit_button_layout->setMargin(GRID_SPACING);
+	digit_button_layout->setSpacing(CELL_SPACING);
+
+	bottom_layout->addWidget(digit_layout_wrap);
 
 	QSignalMapper *m = new QSignalMapper(this);
 	for(int i = 1; i <= cell_span; ++i)
 	{
 		QPushButton *btn = new QPushButton(QString::number(i));
-		button_layout->addWidget(btn);
+
+		btn->setFixedSize(fixed_size, fixed_size);
 
 		m->setMapping(btn, i);
 		connect(btn, SIGNAL(clicked()), m, SLOT(map()));
 
+		digit_button_layout->addWidget(btn, i - 1, 0);
 		digit_btns.push_back(btn);
 	}
 
@@ -56,13 +84,13 @@ Widget::Widget(QWidget *parent) :
 	forward_btn = new QPushButton("Forward");
 	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
 
-	button_layout->addWidget(start_btn);
-	button_layout->addWidget(pause_btn);
-	button_layout->addWidget(hint_btn);
-	button_layout->addWidget(clear_btn);
-	button_layout->addWidget(backward_btn);
-	button_layout->addWidget(forward_btn);
-	button_layout->addWidget(timer);
+	top_layout->addWidget(start_btn);
+	top_layout->addWidget(pause_btn);
+	top_layout->addWidget(hint_btn);
+	top_layout->addWidget(clear_btn);
+	top_layout->addWidget(backward_btn);
+	top_layout->addWidget(forward_btn);
+	top_layout->addWidget(timer);
 }
 
 Widget::~Widget()

@@ -13,7 +13,7 @@ class SudokuGrid : public QLabel
 	Q_OBJECT
 
 public:
-	explicit SudokuGrid(int cell_size = 3, QWidget *parent = 0);
+	explicit SudokuGrid(int cell_size, int fixed_size, QWidget *parent = 0);
 	~SudokuGrid();
 
 signals:
@@ -30,6 +30,9 @@ public slots:
 	void backward_step();
 	void forward_step();
 	void value_changed(int r, int c, int v, IntList candidates = {});
+
+	void light_value();
+	void free_selection();
 
 private:
 	int cell_size, cell_span, fixed_size;

@@ -45,3 +45,9 @@ bool ActionQueue::is_backwardable() const
 {
 	return cur_pos > 0;
 }
+
+void ActionQueue::reset()
+{
+	cur_pos = 0;
+	actions.clear();
+}
