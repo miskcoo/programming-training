@@ -176,20 +176,20 @@ void SudokuCell::update_text()
 
 void SudokuCell::mousePressEvent(QMouseEvent *ev)
 {
-	if(initial_status == 0)
-	{
-		emit_selected_signal();
+//	if(initial_status == 0)
+//	{
+	emit_selected_signal();
 
-		if(ev->button() == Qt::RightButton)
-			set_mark(!is_marked);
-	} else emit free_signal();
+	if(ev->button() == Qt::RightButton)
+		set_mark(!is_marked);
+//	} else emit free_signal();
 }
 
 void SudokuCell::keyPressEvent(QKeyEvent *ev)
 {
-	if(initial_status == 0)
+	int key = ev->key();
+	if(!is_initial_status())
 	{
-		int key = ev->key();
 		if(Qt::Key_1 <= key && key <= Qt::Key_9)
 		{
 			int val = key - Qt::Key_0;
@@ -199,6 +199,9 @@ void SudokuCell::keyPressEvent(QKeyEvent *ev)
 		} else if(key == Qt::Key_Backspace)
 			remove_value(-1);
 	}
+
+	if(key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Down || key == Qt::Key_Up || key == Qt::Key_Tab)
+		emit move_focus(key);
 }
 
 void SudokuCell::focusInEvent(QFocusEvent *)
@@ -296,4 +299,9 @@ void SudokuCell::recover_status(bool value_settled, IntList candidates)
 	this->candidates = candidates;
 	update_text();
 	update_style();
+}
+
+bool SudokuCell::is_initial_status() const
+{
+	return initial_status != 0;
 }

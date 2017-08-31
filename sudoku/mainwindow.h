@@ -25,6 +25,7 @@ public slots:
 	void set_backward_enable(bool);
 	void set_forward_enable(bool);
 	void game_start();
+	void level_changed(int);
 
 private:
 	Ui::MainWindow *ui;
@@ -34,6 +35,7 @@ private:
 	std::vector<DigitButton*> digit_btns;
 	ToolButton *start_btn, *pause_btn, *hint_btn;
 	ToolButton *clear_btn, *backward_btn, *forward_btn;
+	QLabel *level_label;
 	SudokuGrid *grid;
 	Timer *timer;
 

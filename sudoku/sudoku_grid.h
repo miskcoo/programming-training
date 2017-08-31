@@ -31,6 +31,7 @@ public slots:
 	void game_hint();
 	void game_solve();
 
+	void move_focus(int);
 	void backward_step();
 	void forward_step();
 	void value_changed(int, int, bool, IntList, bool, IntList);

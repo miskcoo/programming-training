@@ -4,7 +4,7 @@
 DigitButton::DigitButton(QWidget *parent)
 	: QPushButton(parent)
 {
-
+	setFocusPolicy(Qt::NoFocus);
 }
 
 void DigitButton::mouseReleaseEvent(QMouseEvent *e)

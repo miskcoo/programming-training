@@ -48,6 +48,7 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	digit_button_layout->setMargin(GRID_SPACING);
 	digit_button_layout->setSpacing(CELL_SPACING);
 
+	bottom_layout->setSpacing(10);
 	bottom_layout->addWidget(digit_layout_wrap);
 
 	QSignalMapper *m_r = new QSignalMapper(this);
@@ -82,7 +83,6 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	start_btn = new ToolButton;
 	start_btn->set_image(":/icons/icons/restart.png");
 	connect(start_btn, SIGNAL(clicked()), this, SLOT(game_start()));
-	connect(start_btn, SIGNAL(clicked()), timer, SLOT(restart_timer()));
 
 	pause_btn = new ToolButton;
 	pause_btn->set_image(":/icons/icons/pause.png");
@@ -107,6 +107,18 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
 	connect(grid, SIGNAL(set_forward_enable(bool)), this, SLOT(set_forward_enable(bool)));
 
+	level_label = new QLabel;
+	level_label->setStyleSheet("font-size: 18pt;");
+	level_label->setContentsMargins(0, 0, 10, 0);
+
+	// set top layout
+	top_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	top_layout->addWidget(level_label);
+
+	timer_layout->addWidget(clock_img);
+	timer_layout->addWidget(timer);
+	top_layout->addLayout(timer_layout);
+
 	top_layout->addWidget(start_btn);
 	top_layout->addWidget(pause_btn);
 	top_layout->addWidget(hint_btn);
@@ -114,11 +126,7 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	top_layout->addWidget(backward_btn);
 	top_layout->addWidget(forward_btn);
 
-	timer_layout->addWidget(clock_img);
-	timer_layout->addWidget(timer);
-	top_layout->addLayout(timer_layout);
-
-	top_layout->addWidget(level_combo);
+	top_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
 	// add menu actions
 	QSignalMapper *m_level = new QSignalMapper(this);
@@ -137,14 +145,19 @@ MainWindow::MainWindow(QMainWindow *parent) :
 		ui->level_menu->addAction(level_action);
 	}
 
-	connect(m_level, SIGNAL(mapped(int)), grid, SLOT(level_changed(int)));
-	connect(ui->actionNew_Game, SIGNAL(triggered()), grid, SLOT(game_start()));
+	QAction *level_empty = new QAction("Level Empty");
+	m_level->setMapping(level_empty, 0);
+	connect(level_empty, SIGNAL(triggered()), m_level, SLOT(map()));
+	level_group->addAction(level_empty);
+	ui->level_menu->addAction(level_empty);
+
+	connect(m_level, SIGNAL(mapped(int)), this, SLOT(level_changed(int)));
+	connect(ui->actionNew_Game, SIGNAL(triggered()), this, SLOT(game_start()));
 	connect(ui->actionHint_one, SIGNAL(triggered()), grid, SLOT(game_hint()));
 	connect(ui->actionHint_All, SIGNAL(triggered()), grid, SLOT(game_solve()));
 
 	// run the game
-	grid->game_start();
-	timer->restart_timer();
+	level_changed(1);
 }
 
 MainWindow::~MainWindow()
@@ -172,6 +185,14 @@ void MainWindow::set_forward_enable(bool enabled)
 
 void MainWindow::game_start()
 {
+	timer->restart_timer();
 	if(is_paused) toggle_button();
 	grid->game_start();
+}
+
+void MainWindow::level_changed(int level)
+{
+	grid->level_changed(level);
+	level_label->setText("Level " + QString::number(level));
+	game_start();
 }

@@ -29,9 +29,8 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 					int row = r * cell_size + x;
 					int col = c * cell_size + y;
 					SudokuCell *cell = new SudokuCell(row, col, sudoku);
-					cell->setFocusPolicy(Qt::StrongFocus);
+					cell->setFocusPolicy(Qt::ClickFocus);
 					cell->setFixedSize(fixed_size, fixed_size);
-					// cell->setWordWrap(true);
 					cell->setTextFormat(Qt::PlainText);
 					cell->setAlignment(Qt::AlignCenter);
 
@@ -64,6 +63,9 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 			connect(cell, SIGNAL(free_signal()),
 					this, SLOT(free_selection()));
 
+			connect(cell, SIGNAL(move_focus(int)),
+					this, SLOT(move_focus(int)));
+
 			for(int i = 0; i != cell_span; ++i)
 			{
 				connect(cell, SIGNAL(selected_signal(SudokuCell*)),
@@ -93,24 +95,25 @@ void SudokuGrid::cell_selected(SudokuCell *cell)
 	{
 		free_selection();
 		current_selected = cell;
+		cell->setFocus();
 	}
 }
 
 void SudokuGrid::add_value(int v)
 {
-	if(current_selected)
+	if(current_selected && !current_selected->is_initial_status())
 		current_selected->add_value(v);
 }
 
 void SudokuGrid::set_value(int v)
 {
-	if(current_selected)
+	if(current_selected && !current_selected->is_initial_status())
 		current_selected->set_value(v);
 }
 
 void SudokuGrid::remove_value(int v)
 {
-	if(current_selected)
+	if(current_selected && !current_selected->is_initial_status())
 		current_selected->remove_value(v);
 }
 
@@ -120,7 +123,9 @@ void SudokuGrid::game_start()
 		free_selection();
 	current_selected = nullptr;
 
-	*sudoku = Sudoku::generate(cell_size, current_level);
+	if(current_level)
+		*sudoku = Sudoku::generate(cell_size, current_level);
+	else sudoku->clear();
 
 	for(int r = 0; r != cell_span; ++r)
 		for(int c = 0; c != cell_span; ++c)
@@ -145,6 +150,7 @@ void SudokuGrid::game_solve()
 			for(int c = 0; c != cell_span; ++c)
 				if(sudoku->get(r, c) == 0)
 					cells[r * cell_span + c]->set_value(hint_sudoku.get(r, c));
+	}
 }
 
 void SudokuGrid::game_hint()
@@ -175,7 +181,7 @@ void SudokuGrid::game_hint()
 
 void SudokuGrid::clear_grid()
 {
-	if(current_selected)
+	if(current_selected && !current_selected->is_initial_status())
 		current_selected->clear_values();
 }
 
@@ -253,6 +259,36 @@ void SudokuGrid::free_selection()
 
 void SudokuGrid::level_changed(int index)
 {
-	current_level = index + SUDOKU_LEVEL_MIN;
-	game_start();
+	current_level = index;
+}
+
+void SudokuGrid::move_focus(int key)
+{
+	if(!current_selected)
+		return;
+
+	int row = current_selected->get_row();
+	int col = current_selected->get_col();
+	int dr = 0, dc = 0;
+
+	if(key == Qt::Key_Left) dc = -1;
+	else if(key == Qt::Key_Right) dc = 1;
+	else if(key == Qt::Key_Up) dr = -1;
+	else if(key == Qt::Key_Down) dr = 1;
+
+	row += dr, col += dc;
+
+	if(key == Qt::Key_Tab)
+	{
+		if(++col == cell_span)
+			col = 0, ++row;
+		if(row == cell_span)
+			col = row = 0;
+	}
+
+	if(0 <= row && row < cell_span && 0 <= col && col < cell_span)
+	{
+		int id = row * cell_span + col;
+		cells[id]->emit_selected_signal();
+	}
 }

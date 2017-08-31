@@ -16,6 +16,7 @@ public:
 	int get_initial_status() const;
 
 	IntList get_candidates() const;
+	bool is_initial_status() const;
 
 	void add_value(int v, bool emit_signal = true);
 	void set_value(int v, bool emit_signal = true);
@@ -36,6 +37,7 @@ signals:
 	void selected_signal(SudokuCell*);
 	void free_signal();
 	void value_changed(int, int, bool, IntList, bool, IntList);
+	void move_focus(int);
 
 public slots:
 	void vertical_selected();

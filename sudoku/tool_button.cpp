@@ -10,6 +10,7 @@ void ToolButton::set_image(QString path)
 
 void ToolButton::update_style()
 {
+	setFocusPolicy(Qt::NoFocus);
 	setFixedSize(TOOL_FIXED_SIZE, TOOL_FIXED_SIZE);
 	setContentsMargins(3, 0, 3, 0);
 	update();
