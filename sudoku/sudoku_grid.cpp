@@ -96,6 +96,7 @@ void SudokuGrid::cell_selected(SudokuCell *cell)
 		free_selection();
 		current_selected = cell;
 		cell->setFocus();
+		emit update_digit_signal(cell->get_candidates());
 	}
 }
 
@@ -137,6 +138,7 @@ void SudokuGrid::game_start()
 	actions.reset();
 	emit set_forward_enable(false);
 	emit set_backward_enable(false);
+	emit update_digit_signal(IntList(cell_span + 1, 0));
 }
 
 void SudokuGrid::game_solve()
@@ -194,8 +196,14 @@ void SudokuGrid::value_changed(
 			value_settled_old, candidates_old,
 			value_settled_new, candidates_new);
 
-	emit set_backward_enable(actions.is_backwardable());
-	emit set_forward_enable(actions.is_forwardable());
+	if(sudoku->is_solved())
+	{
+		emit game_over_signal();
+	} else {
+		emit set_backward_enable(actions.is_backwardable());
+		emit set_forward_enable(actions.is_forwardable());
+		emit update_digit_signal(candidates_new);
+	}
 }
 
 void SudokuGrid::backward_step()
@@ -211,6 +219,7 @@ void SudokuGrid::backward_step()
 
 	emit set_backward_enable(actions.is_backwardable());
 	emit set_forward_enable(actions.is_forwardable());
+	emit update_digit_signal(cells[id]->get_candidates());
 }
 
 void SudokuGrid::forward_step()
@@ -226,6 +235,7 @@ void SudokuGrid::forward_step()
 
 	emit set_backward_enable(actions.is_backwardable());
 	emit set_forward_enable(actions.is_forwardable());
+	emit update_digit_signal(cells[id]->get_candidates());
 }
 
 void SudokuGrid::light_value()
@@ -252,6 +262,8 @@ void SudokuGrid::free_selection()
 
 		for(SudokuCell* cell : cells)
 			cell->light_value(0);
+
+		emit update_digit_signal(IntList(cell_span + 1, 0));
 	}
 
 	current_selected = nullptr;
@@ -291,4 +303,9 @@ void SudokuGrid::move_focus(int key)
 		int id = row * cell_span + col;
 		cells[id]->emit_selected_signal();
 	}
+}
+
+SudokuCell* SudokuGrid::get_current_selected() const
+{
+	return current_selected;
 }

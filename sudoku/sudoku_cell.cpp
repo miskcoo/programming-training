@@ -200,17 +200,9 @@ void SudokuCell::keyPressEvent(QKeyEvent *ev)
 			remove_value(-1);
 	}
 
-	if(key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Down || key == Qt::Key_Up || key == Qt::Key_Tab)
+	if(key == Qt::Key_Left || key == Qt::Key_Right || key == Qt::Key_Down
+			|| key == Qt::Key_Up || key == Qt::Key_Tab)
 		emit move_focus(key);
-}
-
-void SudokuCell::focusInEvent(QFocusEvent *)
-{
-//	emit selected_signal(this);
-}
-
-void SudokuCell::focusOutEvent(QFocusEvent *)
-{
 }
 
 void SudokuCell::paintEvent(QPaintEvent *ev)
@@ -304,4 +296,9 @@ void SudokuCell::recover_status(bool value_settled, IntList candidates)
 bool SudokuCell::is_initial_status() const
 {
 	return initial_status != 0;
+}
+
+bool SudokuCell::is_value_settled() const
+{
+	return value_settled;
 }

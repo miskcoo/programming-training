@@ -16,9 +16,13 @@ public:
 	explicit SudokuGrid(int cell_size, int fixed_size, QWidget *parent = 0);
 	~SudokuGrid();
 
+	SudokuCell *get_current_selected() const;
+
 signals:
 	void set_forward_enable(bool);
 	void set_backward_enable(bool);
+	void update_digit_signal(IntList);
+	void game_over_signal();
 
 public slots:
 	void cell_selected(SudokuCell*);

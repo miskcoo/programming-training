@@ -21,6 +21,12 @@ bool Sudoku::is_empty() const
 	return count(grids_.begin(), grids_.end(), 0) == span_ * span_;
 }
 
+bool Sudoku::is_solved() const
+{
+	return std::count(grids_.begin(), grids_.end(), 0) == 0
+		&& is_consistent();
+}
+
 void Sudoku::clear()
 {
 	fill(grids_.begin(), grids_.end(), 0);

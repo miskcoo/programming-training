@@ -17,6 +17,7 @@ public:
 
 	IntList get_candidates() const;
 	bool is_initial_status() const;
+	bool is_value_settled() const;
 
 	void add_value(int v, bool emit_signal = true);
 	void set_value(int v, bool emit_signal = true);
@@ -47,8 +48,6 @@ public slots:
 protected:
 	void mousePressEvent(QMouseEvent*);
 	void keyPressEvent(QKeyEvent*);
-	void focusInEvent(QFocusEvent*);
-	void focusOutEvent(QFocusEvent*);
 	void paintEvent(QPaintEvent*);
 
 private:

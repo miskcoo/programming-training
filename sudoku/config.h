@@ -11,8 +11,8 @@
 #define SELECTED_BG_COLOR   "#eee"
 #define GRID_BG_COLOR       "#777"
 
-#define PRESSED_BG_COLOR     "#aaa"
-#define HOVER_BG_COLOR       DEFAULT_BG_COLOR
+#define PRESSED_BG_COLOR     "#eee"
+#define HOVER_BG_COLOR       "#eee"
 
 #define CELL_SPACING  1
 #define GRID_SPACING  2

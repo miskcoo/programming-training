@@ -10,6 +10,8 @@ class Timer : public QLabel
 public:
 	explicit Timer(QWidget *parent = 0);
 
+	void stop_timer();
+
 signals:
 
 public slots:

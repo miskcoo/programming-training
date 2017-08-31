@@ -21,6 +21,8 @@ public:
 
 	// check whether all grids are unfilled
 	bool is_empty() const;
+	// check whether the Sudoku is solved
+	bool is_solved() const;
 	// set all grids to be unfilled, namely 0
 	void clear();
 	// set (x, y) to be unfilled, namely 0

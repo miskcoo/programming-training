@@ -25,7 +25,11 @@ public slots:
 	void set_backward_enable(bool);
 	void set_forward_enable(bool);
 	void game_start();
+	void game_over();
 	void level_changed(int);
+	void update_digit(IntList);
+	void digit_add_value(int);
+	void digit_set_value(int);
 
 private:
 	Ui::MainWindow *ui;

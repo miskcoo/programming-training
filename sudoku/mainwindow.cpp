@@ -70,8 +70,8 @@ MainWindow::MainWindow(QMainWindow *parent) :
 		digit_btns.push_back(btn);
 	}
 
-	connect(m_r, SIGNAL(mapped(int)), grid, SLOT(add_value(int)));
-	connect(m_l, SIGNAL(mapped(int)), grid, SLOT(set_value(int)));
+	connect(m_r, SIGNAL(mapped(int)), this, SLOT(digit_add_value(int)));
+	connect(m_l, SIGNAL(mapped(int)), this, SLOT(digit_set_value(int)));
 
 	QHBoxLayout *timer_layout = new QHBoxLayout;
 	timer_layout->setContentsMargins(15, 5, 15, 5);
@@ -86,7 +86,6 @@ MainWindow::MainWindow(QMainWindow *parent) :
 
 	pause_btn = new ToolButton;
 	pause_btn->set_image(":/icons/icons/pause.png");
-	connect(pause_btn, SIGNAL(clicked()), timer, SLOT(toggle_timer()));
 	connect(pause_btn, SIGNAL(clicked()), this, SLOT(toggle_button()));
 
 	hint_btn = new ToolButton;
@@ -156,6 +155,11 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	connect(ui->actionHint_one, SIGNAL(triggered()), grid, SLOT(game_hint()));
 	connect(ui->actionHint_All, SIGNAL(triggered()), grid, SLOT(game_solve()));
 
+	connect(grid, SIGNAL(update_digit_signal(IntList)),
+			this, SLOT(update_digit(IntList)));
+	connect(grid, SIGNAL(game_over_signal()),
+			this, SLOT(game_over()));
+
 	// run the game
 	level_changed(1);
 }
@@ -167,10 +171,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::toggle_button()
 {
+	timer->toggle_timer();
 	is_paused = !is_paused;
+	grid->setEnabled(!is_paused);
+	for(DigitButton* btn : digit_btns)
+		btn->setEnabled(!is_paused);
 	if(is_paused)
+	{
 		pause_btn->set_image(":/icons/icons/play.png");
-	else pause_btn->set_image(":/icons/icons/pause.png");
+	} else {
+		pause_btn->set_image(":/icons/icons/pause.png");
+	}
 }
 
 void MainWindow::set_backward_enable(bool enabled)
@@ -195,4 +206,40 @@ void MainWindow::level_changed(int level)
 	grid->level_changed(level);
 	level_label->setText("Level " + QString::number(level));
 	game_start();
+}
+
+void MainWindow::update_digit(IntList candidates)
+{
+	for(int i = 1; i != (int)candidates.size(); ++i)
+		digit_btns[i - 1]->set_checked(candidates[i]);
+}
+
+void MainWindow::digit_add_value(int pos)
+{
+	SudokuCell *cell = grid->get_current_selected();
+	if(digit_btns[pos - 1]->is_checked() && cell)
+	{
+		if(cell->is_value_settled())
+			grid->add_value(pos);
+		else grid->remove_value(pos);
+	} else grid->add_value(pos);
+}
+
+void MainWindow::digit_set_value(int pos)
+{
+	SudokuCell *cell = grid->get_current_selected();
+	if(digit_btns[pos - 1]->is_checked() && cell)
+	{
+		if(!cell->is_value_settled())
+			grid->set_value(pos);
+		else grid->remove_value(pos);
+	} else grid->set_value(pos);
+}
+
+void MainWindow::game_over()
+{
+	if(!is_paused) toggle_button();
+	grid->free_selection();
+	for(DigitButton *digit_btn : digit_btns)
+		digit_btn->set_checked(false);
 }
