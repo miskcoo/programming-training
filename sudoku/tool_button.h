@@ -7,7 +7,7 @@ class ToolButton : public QPushButton
 {
 	Q_OBJECT
 public:
-	using QPushButton::QPushButton;
+	ToolButton(QWidget* parent = 0);
 
 	void set_image(QString);
 signals:
@@ -18,12 +18,14 @@ protected:
 	void paintEvent(QPaintEvent *);
 	void mousePressEvent(QMouseEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
+	void enterEvent(QEvent *);
+	void leaveEvent(QEvent *);
 
 private:
 	void update_style();
 
 private:
-	bool is_mouse_pressed;
+	bool is_mouse_pressed, is_mouse_over;
 	QString image_path;
 };
 

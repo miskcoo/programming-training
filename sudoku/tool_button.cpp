@@ -1,18 +1,25 @@
 #include "tool_button.h"
 #include "config.h"
 
+ToolButton::ToolButton(QWidget *parent)
+	: QPushButton(parent)
+{
+	is_mouse_over = false;
+	is_mouse_pressed = false;
+	setFocusPolicy(Qt::NoFocus);
+	setFixedSize(TOOL_FIXED_SIZE, TOOL_FIXED_SIZE);
+	setContentsMargins(3, 0, 3, 0);
+	setAttribute(Qt::WA_Hover, true);
+}
+
 void ToolButton::set_image(QString path)
 {
-	is_mouse_pressed = false;
 	image_path = path;
 	update_style();
 }
 
 void ToolButton::update_style()
 {
-	setFocusPolicy(Qt::NoFocus);
-	setFixedSize(TOOL_FIXED_SIZE, TOOL_FIXED_SIZE);
-	setContentsMargins(3, 0, 3, 0);
 	update();
 }
 
@@ -33,6 +40,9 @@ void ToolButton::paintEvent(QPaintEvent *)
 		p.drawPixmap(QPoint(0, 0), bg);
 		if(is_mouse_pressed)
 		{
+			p.setCompositionMode(QPainter::CompositionMode_Multiply);
+			p.drawPixmap(QPoint(0, 0), bg);
+		} else if(is_mouse_over) {
 			p.setCompositionMode(QPainter::CompositionMode_HardLight);
 			p.drawPixmap(QPoint(0, 0), bg);
 		}
@@ -51,4 +61,16 @@ void ToolButton::mouseReleaseEvent(QMouseEvent *ev)
 	if(ev->button() == Qt::LeftButton)
 		is_mouse_pressed = false;
 	QPushButton::mouseReleaseEvent(ev);
+}
+
+void ToolButton::enterEvent(QEvent *ev)
+{
+	is_mouse_over = true;
+	QPushButton::enterEvent(ev);
+}
+
+void ToolButton::leaveEvent(QEvent *ev)
+{
+	is_mouse_over = false;
+	QPushButton::leaveEvent(ev);
 }

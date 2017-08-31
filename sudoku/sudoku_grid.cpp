@@ -10,7 +10,7 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 	  fixed_size(fixed_size),
 	  current_selected(nullptr),
 	  sudoku(std::make_shared<Sudoku>(cell_size)),
-	  actions(10)
+	  actions(ACTIONS_MAX_SIZE)
 {
 	// init cells
 	top_layer = new QGridLayout(this);

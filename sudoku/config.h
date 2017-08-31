@@ -17,4 +17,6 @@
 #define CELL_SPACING  1
 #define GRID_SPACING  2
 
+#define ACTIONS_MAX_SIZE 50
+
 #endif // CONFIG_H

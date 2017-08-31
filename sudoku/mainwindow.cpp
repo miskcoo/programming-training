@@ -48,8 +48,9 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	digit_button_layout->setMargin(GRID_SPACING);
 	digit_button_layout->setSpacing(CELL_SPACING);
 
-	bottom_layout->setSpacing(10);
+	bottom_layout->setSpacing(15);
 	bottom_layout->addWidget(digit_layout_wrap);
+	bottom_layout->setContentsMargins(8, 0, 8, 8);
 
 	QSignalMapper *m_r = new QSignalMapper(this);
 	QSignalMapper *m_l = new QSignalMapper(this);
@@ -79,6 +80,7 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	ToolButton *clock_img = new ToolButton;
 	clock_img->set_image(":/icons/icons/alarm-clock.png");
 	clock_img->setFixedSize(18, 18);
+	clock_img->setEnabled(false);
 
 	start_btn = new ToolButton;
 	start_btn->set_image(":/icons/icons/restart.png");
@@ -159,6 +161,8 @@ MainWindow::MainWindow(QMainWindow *parent) :
 			this, SLOT(update_digit(IntList)));
 	connect(grid, SIGNAL(game_over_signal()),
 			this, SLOT(game_over()));
+
+	setFixedSize(sizeHint());
 
 	// run the game
 	level_changed(1);

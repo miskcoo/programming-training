@@ -411,6 +411,9 @@ Sudoku Sudoku::generate(int size, int level)
 	}
 
 	Sudoku ret(size);
+	double p = ret.size_ / 3.0 + 1.0e-10;
+	lb *= p;
+	given *= p;
 	ret.random_sudoku(11, ret.span() * ret.span() - given, lb, true, random_type);
 	return ret;
 }
