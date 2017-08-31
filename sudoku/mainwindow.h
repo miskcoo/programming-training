@@ -1,7 +1,7 @@
-#ifndef WIDGET_H
-#define WIDGET_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <vector>
 #include "sudoku_grid.h"
 #include "digit_button.h"
@@ -9,16 +9,16 @@
 #include "timer.h"
 
 namespace Ui {
-class Widget;
+class MainWindow;
 }
 
-class Widget : public QWidget
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	explicit Widget(QWidget *parent = 0);
-	~Widget();
+	explicit MainWindow(QMainWindow *parent = 0);
+	~MainWindow();
 
 public slots:
 	void toggle_button();
@@ -27,18 +27,17 @@ public slots:
 	void game_start();
 
 private:
-	Ui::Widget *ui;
+	Ui::MainWindow *ui;
 	QVBoxLayout *layout;
 	QHBoxLayout *top_layout, *bottom_layout;
 	QGridLayout *digit_button_layout;
 	std::vector<DigitButton*> digit_btns;
 	ToolButton *start_btn, *pause_btn, *hint_btn;
 	ToolButton *clear_btn, *backward_btn, *forward_btn;
-	QComboBox *level_combo;
 	SudokuGrid *grid;
 	Timer *timer;
 
 	bool is_paused;
 };
 
-#endif // WIDGET_H
+#endif // MAINWINDOW_H

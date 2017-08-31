@@ -14,7 +14,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-		widget.cpp \
+		mainwindow.cpp \
 		sudoku.cpp \
 		dancing_link.cpp \
 		sudoku_grid.cpp \
@@ -23,9 +23,9 @@ SOURCES += main.cpp\
 		action_queue.cpp \ 
 		digit_button.cpp \
 		utils.cpp \
-    tool_button.cpp
+		tool_button.cpp
 
-HEADERS  += widget.h \
+HEADERS  += mainwindow.h \
 		utils.h \
 		sudoku.h \
 		dancing_link.h \
@@ -35,10 +35,10 @@ HEADERS  += widget.h \
 		action_queue.h \
 		config.h \
 		digit_button.h \ 
-    tool_button.h
+		tool_button.h
 
 
-FORMS	+= widget.ui
+FORMS	+= mainwindow.ui
 
 RESOURCES += \
     res.qrc

@@ -29,6 +29,7 @@ public slots:
 
 	void game_start();
 	void game_hint();
+	void game_solve();
 
 	void backward_step();
 	void forward_step();

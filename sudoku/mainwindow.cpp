@@ -1,11 +1,11 @@
-#include "widget.h"
-#include "ui_widget.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include "sudoku_grid.h"
 #include "config.h"
 
-Widget::Widget(QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::Widget),
+MainWindow::MainWindow(QMainWindow *parent) :
+	QMainWindow(parent),
+	ui(new Ui::MainWindow),
 	is_paused(false)
 {
 	ui->setupUi(this);
@@ -14,7 +14,10 @@ Widget::Widget(QWidget *parent) :
 	int cell_size = CELL_SIZE;
 	int cell_span = cell_size * cell_size;
 
-	layout = new QVBoxLayout(this);
+	QWidget *window = new QWidget;
+	setCentralWidget(window);
+
+	layout = new QVBoxLayout(window);
 	top_layout = new QHBoxLayout;
 	bottom_layout = new QHBoxLayout;
 
@@ -104,11 +107,6 @@ Widget::Widget(QWidget *parent) :
 	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
 	connect(grid, SIGNAL(set_forward_enable(bool)), this, SLOT(set_forward_enable(bool)));
 
-	level_combo = new QComboBox;
-	for(int i = SUDOKU_LEVEL_MIN; i <= SUDOKU_LEVEL_MAX; ++i)
-		level_combo->addItem(QString::number(i));
-	connect(level_combo, SIGNAL(currentIndexChanged(int)), grid, SLOT(level_changed(int)));
-
 	top_layout->addWidget(start_btn);
 	top_layout->addWidget(pause_btn);
 	top_layout->addWidget(hint_btn);
@@ -122,17 +120,39 @@ Widget::Widget(QWidget *parent) :
 
 	top_layout->addWidget(level_combo);
 
+	// add menu actions
+	QSignalMapper *m_level = new QSignalMapper(this);
+	QActionGroup *level_group = new QActionGroup(this);
+	for(int i = SUDOKU_LEVEL_MIN; i <= SUDOKU_LEVEL_MAX; ++i)
+	{
+		QAction *level_action = new QAction("Level " + QString::number(i));
+		level_action->setCheckable(true);
+		if(i == SUDOKU_LEVEL_MIN)
+			level_action->setChecked(true);
+
+		m_level->setMapping(level_action, i);
+		connect(level_action, SIGNAL(triggered()), m_level, SLOT(map()));
+
+		level_group->addAction(level_action);
+		ui->level_menu->addAction(level_action);
+	}
+
+	connect(m_level, SIGNAL(mapped(int)), grid, SLOT(level_changed(int)));
+	connect(ui->actionNew_Game, SIGNAL(triggered()), grid, SLOT(game_start()));
+	connect(ui->actionHint_one, SIGNAL(triggered()), grid, SLOT(game_hint()));
+	connect(ui->actionHint_All, SIGNAL(triggered()), grid, SLOT(game_solve()));
+
 	// run the game
 	grid->game_start();
 	timer->restart_timer();
 }
 
-Widget::~Widget()
+MainWindow::~MainWindow()
 {
 	delete ui;
 }
 
-void Widget::toggle_button()
+void MainWindow::toggle_button()
 {
 	is_paused = !is_paused;
 	if(is_paused)
@@ -140,17 +160,17 @@ void Widget::toggle_button()
 	else pause_btn->set_image(":/icons/icons/pause.png");
 }
 
-void Widget::set_backward_enable(bool enabled)
+void MainWindow::set_backward_enable(bool enabled)
 {
 	backward_btn->setEnabled(enabled);
 }
 
-void Widget::set_forward_enable(bool enabled)
+void MainWindow::set_forward_enable(bool enabled)
 {
 	forward_btn->setEnabled(enabled);
 }
 
-void Widget::game_start()
+void MainWindow::game_start()
 {
 	if(is_paused) toggle_button();
 	grid->game_start();

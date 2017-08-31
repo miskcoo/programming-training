@@ -134,6 +134,18 @@ void SudokuGrid::game_start()
 	emit set_backward_enable(false);
 }
 
+void SudokuGrid::game_solve()
+{
+	Sudoku hint_sudoku = sudoku->solve();
+	if(hint_sudoku.is_empty())
+	{
+		QMessageBox::warning(this, "No Solution!", "Your current status leads to no solution.");
+	} else {
+		for(int r = 0; r != cell_span; ++r)
+			for(int c = 0; c != cell_span; ++c)
+				if(sudoku->get(r, c) == 0)
+					cells[r * cell_span + c]->set_value(hint_sudoku.get(r, c));
+}
 
 void SudokuGrid::game_hint()
 {
@@ -242,4 +254,5 @@ void SudokuGrid::free_selection()
 void SudokuGrid::level_changed(int index)
 {
 	current_level = index + SUDOKU_LEVEL_MIN;
+	game_start();
 }
