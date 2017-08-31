@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Sudoku</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <widget class="QWidget" name="centralWidget"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -38,6 +41,7 @@
      </property>
     </widget>
     <addaction name="actionNew_Game"/>
+    <addaction name="actionRestart_Game"/>
     <addaction name="actionHint_one"/>
     <addaction name="actionHint_All"/>
     <addaction name="grid_size_menu"/>
@@ -57,7 +61,12 @@
   </action>
   <action name="actionHint_All">
    <property name="text">
-    <string>Hint All</string>
+    <string>Solve</string>
+   </property>
+  </action>
+  <action name="actionRestart_Game">
+   <property name="text">
+    <string>Restart Game</string>
    </property>
   </action>
  </widget>

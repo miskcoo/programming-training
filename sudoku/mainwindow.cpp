@@ -133,28 +133,39 @@ void MainWindow::init_widgets(int cell_size)
 	clock_img->setEnabled(false);
 
 	start_btn = new ToolButton;
-	start_btn->set_image(":/icons/icons/restart.png");
+	start_btn->set_image(":/icons/icons/new.png");
+	start_btn->setToolTip("New Game");
 	connect(start_btn, SIGNAL(clicked()), this, SLOT(game_start()));
+
+	reset_btn = new ToolButton;
+	reset_btn->set_image(":/icons/icons/restart.png");
+	reset_btn->setToolTip("Restart");
+	connect(reset_btn, SIGNAL(clicked()), this, SLOT(game_reset()));
 
 	pause_btn = new ToolButton;
 	pause_btn->set_image(":/icons/icons/pause.png");
+	pause_btn->setToolTip("Pause");
 	connect(pause_btn, SIGNAL(clicked()), this, SLOT(toggle_button()));
 
 	hint_btn = new ToolButton;
 	hint_btn->set_image(":/icons/icons/information.png");
+	hint_btn->setToolTip("Hint");
 	connect(hint_btn, SIGNAL(clicked()), grid, SLOT(game_hint()));
 
 	clear_btn = new ToolButton;
 	clear_btn->set_image(":/icons/icons/eraser.png");
+	clear_btn->setToolTip("Clear Cell");
 	connect(clear_btn, SIGNAL(clicked()), grid, SLOT(clear_grid()));
 
 	backward_btn = new ToolButton;
 	backward_btn->set_image(":/icons/icons/back.png");
+	backward_btn->setToolTip("Undo");
 	connect(backward_btn, SIGNAL(clicked()), grid, SLOT(backward_step()));
 	connect(grid, SIGNAL(set_backward_enable(bool)), this, SLOT(set_backward_enable(bool)));
 
 	forward_btn = new ToolButton;
 	forward_btn->set_image(":/icons/icons/next.png");
+	forward_btn->setToolTip("Rndo");
 	connect(forward_btn, SIGNAL(clicked()), grid, SLOT(forward_step()));
 	connect(grid, SIGNAL(set_forward_enable(bool)), this, SLOT(set_forward_enable(bool)));
 
@@ -171,6 +182,7 @@ void MainWindow::init_widgets(int cell_size)
 	top_layout->addLayout(timer_layout);
 
 	top_layout->addWidget(start_btn);
+	top_layout->addWidget(reset_btn);
 	top_layout->addWidget(pause_btn);
 	top_layout->addWidget(hint_btn);
 	top_layout->addWidget(clear_btn);
@@ -186,6 +198,7 @@ void MainWindow::init_widgets(int cell_size)
 	connect(ui->actionNew_Game, SIGNAL(triggered()), this, SLOT(game_start()));
 	connect(ui->actionHint_one, SIGNAL(triggered()), grid, SLOT(game_hint()));
 	connect(ui->actionHint_All, SIGNAL(triggered()), grid, SLOT(game_solve()));
+	connect(ui->actionRestart_Game, SIGNAL(triggered()), this, SLOT(game_reset()));
 
 	setFixedSize(window->minimumSizeHint() + ui->menuBar->minimumSizeHint());
 
@@ -205,11 +218,15 @@ void MainWindow::toggle_button()
 	grid->setEnabled(!is_paused);
 	for(DigitButton* btn : digit_btns)
 		btn->setEnabled(!is_paused);
+	set_tool_enable(!is_paused);
+	pause_btn->setEnabled(true);
 	if(is_paused)
 	{
 		pause_btn->set_image(":/icons/icons/play.png");
+		pause_btn->setToolTip("Continue");
 	} else {
 		pause_btn->set_image(":/icons/icons/pause.png");
+		pause_btn->setToolTip("Pause");
 	}
 }
 
@@ -225,11 +242,18 @@ void MainWindow::set_forward_enable(bool enabled)
 
 void MainWindow::game_start()
 {
-	pause_btn->setEnabled(true);
-	timer->setEnabled(true);
+	set_tool_enable(true);
 	if(is_paused) toggle_button();
 	timer->restart_timer();
 	grid->game_start();
+}
+
+void MainWindow::game_reset()
+{
+	set_tool_enable(true);
+	if(is_paused) toggle_button();
+	timer->restart_timer();
+	grid->game_reset();
 }
 
 void MainWindow::level_changed(int level)
@@ -273,8 +297,17 @@ void MainWindow::game_over()
 	grid->free_selection();
 	for(DigitButton *digit_btn : digit_btns)
 		digit_btn->set_checked(false);
-	pause_btn->setEnabled(false);
-	timer->setEnabled(false);
+	set_tool_enable(false);
+}
+
+void MainWindow::set_tool_enable(bool is_enabled)
+{
+	pause_btn->setEnabled(is_enabled);
+	forward_btn->setEnabled(is_enabled);
+	backward_btn->setEnabled(is_enabled);
+	clear_btn->setEnabled(is_enabled);
+	hint_btn->setEnabled(is_enabled);
+	timer->setEnabled(is_enabled);
 }
 
 void MainWindow::change_cell_size(int size)

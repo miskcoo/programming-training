@@ -32,6 +32,7 @@ public slots:
 	void clear_grid();
 
 	void game_start();
+	void game_reset();
 	void game_hint();
 	void game_solve();
 
@@ -52,6 +53,7 @@ private:
 	std::vector<QGridLayout*> grids;
 	std::vector<SudokuCell*> cells;
 
+	Sudoku initial_sudoku;
 	std::shared_ptr<Sudoku> sudoku;
 	ActionQueue actions;
 };

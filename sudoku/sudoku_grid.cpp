@@ -87,7 +87,6 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 
 SudokuGrid::~SudokuGrid()
 {
-	qDebug() << "DELETE!";
 }
 
 void SudokuGrid::cell_selected(SudokuCell *cell)
@@ -121,19 +120,23 @@ void SudokuGrid::remove_value(int v)
 
 void SudokuGrid::game_start()
 {
-	if(current_selected)
-		free_selection();
-	current_selected = nullptr;
-
+	free_selection();
 	if(current_level)
 		*sudoku = Sudoku::generate(cell_size, current_level);
 	else sudoku->clear();
+	initial_sudoku = *sudoku;
+	game_reset();
+}
 
+void SudokuGrid::game_reset()
+{
+	free_selection();
+	*sudoku = initial_sudoku;
 	for(int r = 0; r != cell_span; ++r)
 		for(int c = 0; c != cell_span; ++c)
 		{
 			int id = r * cell_span + c;
-			cells[id]->set_initial_status(sudoku->get(r, c));
+			cells[id]->set_initial_status(initial_sudoku.get(r, c));
 		}
 
 	actions.reset();
@@ -161,7 +164,17 @@ void SudokuGrid::game_hint()
 	Sudoku hint_sudoku = sudoku->solve();
 	if(hint_sudoku.is_empty())
 	{
-		QMessageBox::warning(this, "No Solution!", "Your current status leads to no solution.");
+		free_selection();
+
+		hint_sudoku = initial_sudoku.solve();
+		for(int r = 0; r != cell_span; ++r)
+			for(int c = 0; c != cell_span; ++c)
+			{
+				int val = sudoku->get(r, c);
+				if(val && val != hint_sudoku.get(r, c))
+					cells[r * cell_span + c]->light_value(val);
+			}
+//		QMessageBox::warning(this, "No Solution!", "Your current status leads to no solution.");
 	} else {
 		IntList empty_cells;
 		for(int r = 0; r != cell_span; ++r)

@@ -25,6 +25,7 @@ public slots:
 	void set_backward_enable(bool);
 	void set_forward_enable(bool);
 	void game_start();
+	void game_reset();
 	void game_over();
 	void level_changed(int);
 	void update_digit(IntList);
@@ -36,6 +37,7 @@ public slots:
 private:
 	void init_widgets(int);
 	void init_menu();
+	void set_tool_enable(bool);
 
 private:
 	Ui::MainWindow *ui;
@@ -44,7 +46,7 @@ private:
 	QHBoxLayout *top_layout, *bottom_layout;
 	QGridLayout *digit_button_layout;
 	std::vector<DigitButton*> digit_btns;
-	ToolButton *start_btn, *pause_btn, *hint_btn;
+	ToolButton *start_btn, *reset_btn, *pause_btn, *hint_btn;
 	ToolButton *clear_btn, *backward_btn, *forward_btn;
 	QLabel *level_label;
 	SudokuGrid *grid;

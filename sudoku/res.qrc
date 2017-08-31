@@ -9,5 +9,6 @@
         <file>icons/question.png</file>
         <file>icons/restart.png</file>
         <file>icons/alarm-clock.png</file>
+        <file>icons/new.png</file>
     </qresource>
 </RCC>
