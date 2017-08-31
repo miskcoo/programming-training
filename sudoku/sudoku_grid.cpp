@@ -87,6 +87,7 @@ SudokuGrid::SudokuGrid(int cell_size, int fixed_size, QWidget *parent)
 
 SudokuGrid::~SudokuGrid()
 {
+	qDebug() << "DELETE!";
 }
 
 void SudokuGrid::cell_selected(SudokuCell *cell)

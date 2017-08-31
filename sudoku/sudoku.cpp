@@ -362,6 +362,7 @@ void Sudoku::random_sudoku(
 
 Sudoku Sudoku::generate(int size, int level)
 {
+	bool is_unique = true;
 	int given = 81, lb = 0, random_type = DIGGING_RANDOM;
 
 	switch(level)
@@ -411,9 +412,16 @@ Sudoku Sudoku::generate(int size, int level)
 	}
 
 	Sudoku ret(size);
-	double p = ret.size_ / 3.0 + 1.0e-10;
-	lb *= p;
-	given *= p;
-	ret.random_sudoku(11, ret.span() * ret.span() - given, lb, true, random_type);
+
+	if(size > 3)
+	{
+		double p = ret.size_ / 3.0 + 1.0e-10;
+		lb *= p;
+		given *= p * p * p * p;
+		is_unique = false;
+		random_type = DIGGING_RANDOM;
+	}
+
+	ret.random_sudoku(11, ret.span() * ret.span() - given, lb, is_unique, random_type);
 	return ret;
 }

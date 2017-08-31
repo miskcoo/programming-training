@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define CELL_SIZE  3
+#define CELL_SIZE  4
 #define FIXED_SIZE 50
 #define TOOL_FIXED_SIZE 30
 

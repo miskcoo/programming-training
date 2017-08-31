@@ -9,12 +9,62 @@ MainWindow::MainWindow(QMainWindow *parent) :
 	is_paused(false)
 {
 	ui->setupUi(this);
+	init_widgets(3);
+	init_menu();
+}
 
+void MainWindow::init_menu()
+{
+	// add menu actions
+	QSignalMapper *m_level = new QSignalMapper(this);
+	QActionGroup *level_group = new QActionGroup(this);
+	for(int i = SUDOKU_LEVEL_MIN; i <= SUDOKU_LEVEL_MAX; ++i)
+	{
+		QAction *level_action = new QAction("Level " + QString::number(i));
+		level_action->setCheckable(true);
+		if(i == SUDOKU_LEVEL_MIN)
+			level_action->setChecked(true);
+
+		m_level->setMapping(level_action, i);
+		connect(level_action, SIGNAL(triggered()), m_level, SLOT(map()));
+
+		level_group->addAction(level_action);
+		ui->level_menu->addAction(level_action);
+	}
+
+	QAction *level_empty = new QAction("Level Empty");
+	m_level->setMapping(level_empty, 0);
+	connect(level_empty, SIGNAL(triggered()), m_level, SLOT(map()));
+	level_group->addAction(level_empty);
+	ui->level_menu->addAction(level_empty);
+
+	connect(m_level, SIGNAL(mapped(int)), this, SLOT(level_changed(int)));
+
+	QSignalMapper *m_csize = new QSignalMapper(this);
+	QActionGroup *csize_group = new QActionGroup(this);
+	for(int i = 3; i <= 4; ++i)
+	{
+		QAction *csize_action = new QAction(QString::number(i));
+		csize_action->setCheckable(true);
+		if(i == 3)
+			csize_action->setChecked(true);
+
+		m_csize->setMapping(csize_action, i);
+		connect(csize_action, SIGNAL(triggered()), m_csize, SLOT(map()));
+
+		csize_group->addAction(csize_action);
+		ui->grid_size_menu->addAction(csize_action);
+	}
+
+	connect(m_csize, SIGNAL(mapped(int)), this, SLOT(change_cell_size(int)));
+}
+
+void MainWindow::init_widgets(int cell_size)
+{
 	int fixed_size = FIXED_SIZE;
-	int cell_size = CELL_SIZE;
 	int cell_span = cell_size * cell_size;
 
-	QWidget *window = new QWidget;
+	window = new QWidget;
 	setCentralWidget(window);
 
 	layout = new QVBoxLayout(window);
@@ -129,40 +179,15 @@ MainWindow::MainWindow(QMainWindow *parent) :
 
 	top_layout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-	// add menu actions
-	QSignalMapper *m_level = new QSignalMapper(this);
-	QActionGroup *level_group = new QActionGroup(this);
-	for(int i = SUDOKU_LEVEL_MIN; i <= SUDOKU_LEVEL_MAX; ++i)
-	{
-		QAction *level_action = new QAction("Level " + QString::number(i));
-		level_action->setCheckable(true);
-		if(i == SUDOKU_LEVEL_MIN)
-			level_action->setChecked(true);
-
-		m_level->setMapping(level_action, i);
-		connect(level_action, SIGNAL(triggered()), m_level, SLOT(map()));
-
-		level_group->addAction(level_action);
-		ui->level_menu->addAction(level_action);
-	}
-
-	QAction *level_empty = new QAction("Level Empty");
-	m_level->setMapping(level_empty, 0);
-	connect(level_empty, SIGNAL(triggered()), m_level, SLOT(map()));
-	level_group->addAction(level_empty);
-	ui->level_menu->addAction(level_empty);
-
-	connect(m_level, SIGNAL(mapped(int)), this, SLOT(level_changed(int)));
-	connect(ui->actionNew_Game, SIGNAL(triggered()), this, SLOT(game_start()));
-	connect(ui->actionHint_one, SIGNAL(triggered()), grid, SLOT(game_hint()));
-	connect(ui->actionHint_All, SIGNAL(triggered()), grid, SLOT(game_solve()));
-
 	connect(grid, SIGNAL(update_digit_signal(IntList)),
 			this, SLOT(update_digit(IntList)));
 	connect(grid, SIGNAL(game_over_signal()),
 			this, SLOT(game_over()));
+	connect(ui->actionNew_Game, SIGNAL(triggered()), this, SLOT(game_start()));
+	connect(ui->actionHint_one, SIGNAL(triggered()), grid, SLOT(game_hint()));
+	connect(ui->actionHint_All, SIGNAL(triggered()), grid, SLOT(game_solve()));
 
-	setFixedSize(sizeHint());
+	setFixedSize(window->minimumSizeHint() + ui->menuBar->minimumSizeHint());
 
 	// run the game
 	level_changed(1);
@@ -200,8 +225,10 @@ void MainWindow::set_forward_enable(bool enabled)
 
 void MainWindow::game_start()
 {
-	timer->restart_timer();
+	pause_btn->setEnabled(true);
+	timer->setEnabled(true);
 	if(is_paused) toggle_button();
+	timer->restart_timer();
 	grid->game_start();
 }
 
@@ -246,4 +273,14 @@ void MainWindow::game_over()
 	grid->free_selection();
 	for(DigitButton *digit_btn : digit_btns)
 		digit_btn->set_checked(false);
+	pause_btn->setEnabled(false);
+	timer->setEnabled(false);
+}
+
+void MainWindow::change_cell_size(int size)
+{
+	digit_btns.clear();
+	QWidget *old_window = window;
+	init_widgets(size);
+	delete old_window;
 }

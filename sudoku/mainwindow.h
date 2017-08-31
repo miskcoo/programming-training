@@ -31,8 +31,15 @@ public slots:
 	void digit_add_value(int);
 	void digit_set_value(int);
 
+	void change_cell_size(int);
+
+private:
+	void init_widgets(int);
+	void init_menu();
+
 private:
 	Ui::MainWindow *ui;
+	QWidget *window;
 	QVBoxLayout *layout;
 	QHBoxLayout *top_layout, *bottom_layout;
 	QGridLayout *digit_button_layout;
