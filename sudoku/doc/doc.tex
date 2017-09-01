@@ -22,8 +22,8 @@
 
 \renewcommand\refname{参考文献} 
 
-\author{}
-\title{}
+\title{Sudoku的功能及其实现}
+\author{周聿浩\\ \small{2016011347}}
 
 \begin{document}
 \maketitle
@@ -123,4 +123,6 @@ Sudoku提供了多个方便的按钮：
 在整个算法结束后，如果没有删除足够的数字，那么重新运行该算法。
 
 为了实现快速的数独问题求解，我们利用Dancing Link来优化搜索。
+\section{GUI部分实现细节}
+主要的游戏棋盘是通过$3\times 3$的QGridLayout，每个QGridLayout里再套一个$3\times 3$的QGridLayout来实现的。功能按钮的鼠标移入以及点击的效果是通过QPainter::drawImage里图片的混合选项来实现的，通过多次混合以及不同的混合参数就可以实现颜色的深浅变化。
 \end{document}
