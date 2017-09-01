@@ -33,10 +33,15 @@ void Timer::toggle_timer()
 	}
 }
 
+QString Timer::get_time() const
+{
+	return QDateTime::fromTime_t(clock_now).toUTC().toString("hh:mm:ss");
+}
+
 void Timer::timeout()
 {
-	QString time = QDateTime::fromTime_t(++clock_now).toUTC().toString("hh:mm:ss");
-	set_time(time);
+	++clock_now;
+	set_time(get_time());
 }
 
 void Timer::set_time(QString time)

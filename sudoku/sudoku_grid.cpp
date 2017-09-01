@@ -150,7 +150,7 @@ void SudokuGrid::game_solve()
 	Sudoku hint_sudoku = sudoku->solve();
 	if(hint_sudoku.is_empty())
 	{
-		QMessageBox::warning(this, "No Solution!", "Your current status leads to no solution.");
+		QMessageBox::warning(this, "Error", "Your current status leads to no solution.");
 	} else {
 		for(int r = 0; r != cell_span; ++r)
 			for(int c = 0; c != cell_span; ++c)

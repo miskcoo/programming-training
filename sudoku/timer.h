@@ -11,6 +11,7 @@ public:
 	explicit Timer(QWidget *parent = 0);
 
 	void stop_timer();
+	QString get_time() const;
 
 signals:
 
