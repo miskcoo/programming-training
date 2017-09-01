@@ -47,4 +47,10 @@ target_wrapper.*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
+# Vim swap file
+.*.swp
+
+# Latex
+*.aux
+*.log
 
