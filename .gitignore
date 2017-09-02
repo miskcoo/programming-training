@@ -53,4 +53,5 @@ CMakeLists.txt.user*
 # Latex
 *.aux
 *.log
+_minted-doc
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Sudoku</string>
+   <string>Sudoku Game</string>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>

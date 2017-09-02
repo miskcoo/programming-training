@@ -298,7 +298,7 @@ void MainWindow::game_over()
 	for(DigitButton *digit_btn : digit_btns)
 		digit_btn->set_checked(false);
 	set_tool_enable(false);
-	QMessageBox::information(this, "", "Congratulations! You solved this puzzle in " + timer->get_time() + ".");
+	QMessageBox::information(this, "Problem Solved", "Congratulations! You solved this puzzle in " + timer->get_time() + ".");
 }
 
 void MainWindow::set_tool_enable(bool is_enabled)

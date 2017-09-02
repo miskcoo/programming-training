@@ -8,6 +8,7 @@
 \usepackage{abstract}
 \usepackage{subcaption}
 \usepackage{graphicx,float} 
+\usepackage{minted}
 
 \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
 \setmainfont{DejaVu Serif}
@@ -83,9 +84,9 @@ Sudoku提供了多个方便的按钮：
 	\begin{subfigure}{.45\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{sudoku-4d.png}
-		\caption{利用算法解决的答案} \label{fig:sudoku-4d}
+		\caption{利用算法计算出的答案} \label{fig:sudoku-4d}
 	\end{subfigure}
-	\caption{(\subref{fig:sudoku-3b}, \subref{fig:sudoku-3c})上方的按钮从左到有分别为：新游戏、重完、暂停/开始、提示、清除、撤销和取消撤销。黑色的数字表示初始时题目所给出的数字，大号红色数字表示用户已经确定的数字，小号红色数字表示候选的数字。当前选中的格子以及与其所在相同行或列的格子被高亮显示，同时右侧数字栏中已经选择的数字被加粗显示，可以方便进行操作。另外，对于已经确定的数字，其余与其相同并且也已经确定的数字会被加粗显示，如(\subref{fig:sudoku-3c})。玩家对于重要的数字可以进行标记，标记为在格子左上角打上一个三角（例如(\subref{fig:sudoku-3b})中的数字3）。}
+	\caption{(\subref{fig:sudoku-3b}, \subref{fig:sudoku-3c})上方的按钮从左到右分别为：新游戏、重完、暂停/开始、提示、清除、撤销和取消撤销。黑色的数字表示初始时题目所给出的数字，大号红色数字表示用户已经确定的数字，小号红色数字表示候选的数字。当前选中的格子以及与其所在相同行或列的格子被高亮显示，同时右侧数字栏中已经选择的数字被加粗显示，可以方便进行操作。另外，对于已经确定的数字，其余与其相同并且也已经确定的数字会被加粗显示，如(\subref{fig:sudoku-3c})。玩家对于重要的数字可以进行标记，标记为在格子左上角打上一个三角（例如(\subref{fig:sudoku-3b})中的数字3）。}
 \end{figure}
 
 玩家在空格中填入的数字分为确定数（采用正常大小的字体表示）以及候选数（采用小号字体表示）。确定数只能存在一个，候选数可以存在多个，并且确定数和候选数不能同时存在。
@@ -118,11 +119,43 @@ Sudoku提供了多个方便的按钮：
 
 在我们的难度中，最简单的关卡给出的数字至少有50个，并且行列空格数不会超过4个。然而，在最困难的关卡中，最少只会给出20个数字，并且可能会有某些行或列全部是空格。在最简单和最困难中间这两个影响难度的因素平滑过渡。
 
-为了生成一个满足条件的数独，可以先在空白棋盘随机填入数十个数，之后利用求解算法获得一个合法解。再生成一个随机排列，按照这个序列来尝试一个个删除所填入的数字，如果删除后能保证解唯一并且满足之前的条件，那么就删除，否则不删除。
+为了生成一个满足条件的数独，可以按照以下步骤来实现：
 
-在整个算法结束后，如果没有删除足够的数字，那么重新运行该算法。
+\begin{enumerate}
+	\item 在空白棋盘随机填入数十个数。
+	\item 利用求解算法获得一个合法解，如果不存在合法解，转到1。
+	\item 生成一个随机的格子排列。
+	\item 按照这个序列来尝试一个个删除所填入的数字，如果删除后能保证解唯一并且满足之前的条件，那么就删除，否则不删除。
+	\item 如果删除了足够的数字，则返回。否则跳到1。
+\end{enumerate}
 
 为了实现快速的数独问题求解，我们利用Dancing Link来优化搜索。
 \section{GUI部分实现细节}
-主要的游戏棋盘是通过$3\times 3$的QGridLayout，每个QGridLayout里再套一个$3\times 3$的QGridLayout来实现的。功能按钮的鼠标移入以及点击的效果是通过QPainter::drawImage里图片的混合选项来实现的，通过多次混合以及不同的混合参数就可以实现颜色的深浅变化。
+主要的游戏棋盘是通过$3\times 3$的QGridLayout，每个QGridLayout里再套一个$3\times 3$的QGridLayout来实现的。
+
+功能按钮的鼠标移入以及点击的效果是通过QPainter::drawImage里图片的混合选项来实现的，通过多次混合以及不同的混合参数就可以实现颜色的深浅变化：
+
+\begin{minted}{c++}
+void ToolButton::paintEvent(QPaintEvent *)
+{
+    QPainter p(this);
+    QPixmap bg(image_path);
+    p.drawPixmap(QPoint(0, 0), bg);
+    if(is_mouse_pressed)
+    {
+        p.setCompositionMode(QPainter::CompositionMode_Multiply);
+        p.drawPixmap(QPoint(0, 0), bg);
+    } else if(is_mouse_over) {
+        p.setCompositionMode(QPainter::CompositionMode_HardLight);
+        p.drawPixmap(QPoint(0, 0), bg);
+    }
+}
+\end{minted}
+
+另外，关于窗口大小的固定，由于在切换数独棋盘大小时窗口大小也会随之改变，可以利用{\it minimumSizeHint()}来直接进行计算：
+
+\begin{minted}{c++}
+    setFixedSize(window->minimumSizeHint()
+               + ui->menuBar->minimumSizeHint());
+\end{minted}
 \end{document}
