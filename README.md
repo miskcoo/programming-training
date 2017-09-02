@@ -8,9 +8,9 @@
 
 Sudoku 是一款利用 Qt 实现的数独游戏，提供了多达 10 个难度的关卡选择，同时还有丰富的功能来帮助玩家更加高效地求解数独问题，例如候选数、高亮相同数字、高亮选中的行列、撤销当前操作以及提示等功能。玩家还可以手动输入数独题目利用 Sudoku 帮助求解。
 
-除了传统 $9 \times 9$ 的数独游戏以外，还提供了更高难度的 $16 \times 16$ 的数独游戏。
+除了传统 9x9 的数独游戏以外，还提供了更高难度的 16x16 的数独游戏。
 
-<img src="https://github.com/miskcoo/programming-training-assignment/blob/sudoku/sudoku/doc/sudoku-3b.png?raw=true" style="width: 300px; height: 300px; " /><img src="https://github.com/miskcoo/programming-training-assignment/blob/sudoku/sudoku/doc/sudoku-3c.png?raw=true" style="width: 300px; height: 300px; " />
+![](https://github.com/miskcoo/programming-training-assignment/blob/sudoku/sudoku/doc/sudoku-3c.png?raw=true)
 
 ### 基本功能
 
@@ -62,3 +62,7 @@ Sudoku提供了多个方便的按钮：
 5. 如果删除了足够的数字，则返回。否则跳到1。
 
 为了实现快速的数独问题求解，我们利用Dancing Link来优化搜索。
+
+### 参考资料
+[1]: XUE, Y.H., JIANG, B.B., Li, Y., YAN, G.F. and SUN, H.F., 2009. Sudoku puzzles generating: From easy to evil. Mathematics in practice and theory, 21(000).
+[2]: Knuth, D.E., 2000. Dancing links. arXiv preprint cs/0011047.
