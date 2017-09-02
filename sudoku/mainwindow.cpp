@@ -222,6 +222,7 @@ void MainWindow::toggle_button()
 	pause_btn->setEnabled(true);
 	if(is_paused)
 	{
+		grid->free_selection();
 		pause_btn->set_image(":/icons/icons/play.png");
 		pause_btn->setToolTip("Continue");
 	} else {
