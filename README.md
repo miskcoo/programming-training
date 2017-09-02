@@ -65,4 +65,5 @@ Sudoku提供了多个方便的按钮：
 
 ### 参考资料
 [1]: XUE, Y.H., JIANG, B.B., Li, Y., YAN, G.F. and SUN, H.F., 2009. Sudoku puzzles generating: From easy to evil. Mathematics in practice and theory, 21(000).
+
 [2]: Knuth, D.E., 2000. Dancing links. arXiv preprint cs/0011047.
