@@ -4,25 +4,25 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = draughts
+TARGET = draughts-client
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-        draughts.cpp \
+    mainwindow.cpp \
     chessboard.cpp \
-    chesspiece.cpp
+    chesspiece.cpp \
+	draughts.cpp
 
 HEADERS  += mainwindow.h \
-		draughts.h \
-		utils.h \
     chessboard.h \
-	config.h \
-    chesspiece.h
+    config.h \
+    chesspiece.h \
+	draughts.h \
+	utils.h
 
 FORMS    += mainwindow.ui
