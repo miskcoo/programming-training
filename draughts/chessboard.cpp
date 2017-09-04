@@ -12,17 +12,6 @@ ChessBoard::ChessBoard(QWidget *parent)
 	for(int i = 0; i != 10; ++i)
 		for(int j = 0; j != 10; ++j)
 			cell_status[i][j] = 0;
-
-	/* BEGIN: FOR TEST */
-	cell_status[1][1] = 1;
-	cell_status[2][2] = 2;
-	cell_status[3][3] = 3;
-
-	ChessPiece * p = new ChessPiece(this);
-	p->setGeometry(0, 0, 50, 50);
-	p->fadeOut(10000);
-	p->moveAnimation(400, 400, 10000);
-	/* END: FOR TEST */
 }
 
 QRect ChessBoard::getCellRect(int row, int col)

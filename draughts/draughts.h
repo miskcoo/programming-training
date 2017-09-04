@@ -3,7 +3,10 @@
 
 #include "utils.h"
 #include <vector>
+#include <utility>
+#include <functional>
 using std::vector;
+using std::pair;
 
 struct DraughtsInfo
 {
@@ -13,15 +16,12 @@ struct DraughtsInfo
 	};
 
 	bool is_king;
-	int x, y, type;
-	DraughtsInfo(int x = -1, int y = -1, int type = empty, bool is_king = false)
+	int x, y;
+	Types type;
+	DraughtsInfo(int x = -1, int y = -1, Types type = empty, bool is_king = false)
 		: is_king(is_king), x(x), y(y), type(type) {}
-};
 
-struct TraceInfo
-{
-	DraughtsInfo from, to;
-	vector<DraughtsInfo> kill;
+	void set_empty() { type = empty, is_king = false; }
 };
 
 class Draughts
@@ -30,8 +30,22 @@ public:
 	Draughts();
 
 	vector<DraughtsInfo> get_avail_chess(DraughtsInfo::Types player);
-	vector<DraughtsInfo> get_avail_move(DraughtsInfo::Types player);
-	vector<TraceInfo> move(DraughtsInfo src, DraughtsInfo dest);
+	pair<int, vector<DraughtsInfo>> get_avail_move(
+		int x, int y, DraughtsInfo::Types player);
+	vector<DraughtsInfo> move(int src_x, int src_y, int dest_x, int dest_y);
+	DraughtsInfo get_info(int x, int y) const;
+
+private:
+	bool dfs_jump(
+		int step, int x, int y, bool is_king,
+		DraughtsInfo::Types type,
+		std::function<bool(int, DraughtsInfo*, DraughtsInfo*)>);
+	bool check_coord_avail(int x, int y) const;
+
+private:
+	DraughtsInfo status[10][10];
+	DraughtsInfo dfs_info[100], eat_info[100];
+	int mark[10][10];
 };
 
 #endif
