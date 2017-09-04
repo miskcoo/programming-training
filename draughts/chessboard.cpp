@@ -9,6 +9,7 @@ ChessBoard::ChessBoard(QWidget *parent)
 	: QWidget(parent)
 {
 	setFixedSize(501, 501);
+	std::memset(cells, 0, sizeof(cells));
 }
 
 void ChessBoard::initBoard()
@@ -20,14 +21,24 @@ void ChessBoard::initBoard()
 	{
 		for(int j = 0; j != 10; ++j)
 		{
+			if(cells[i][j]) delete cells[i][j];
 			if(!draughts->is_empty(i, j))
 			{
-				cells[i][j] = std::make_shared<ChessPiece>(this);
+				cells[i][j] = new ChessPiece(this);
 				cells[i][j]->setGeometry(getCellRect(i, j));
-				cells[i][j]->setPieceInfo(draughts->get_info(i, j));
 			} else cells[i][j] = nullptr;
 		}
 	}
+
+	updatePieces();
+}
+
+void ChessBoard::updatePieces()
+{
+	for(int i = 0; i != 10; ++i)
+		for(int j = 0; j != 10; ++j)
+			if(!draughts->is_empty(i, j) && cells[i][j])
+				cells[i][j]->setPieceInfo(draughts->get_info(i, j));
 }
 
 QRect ChessBoard::getCellRect(int row, int col)
@@ -125,6 +136,8 @@ void ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 
 		cells[dest_x][dest_y]->moveAnimation(move_seq, 400);
 	}
+
+	updatePieces();
 }
 
 void ChessBoard::mouseReleaseEvent(QMouseEvent *ev)

@@ -22,6 +22,7 @@ public:
 	void markSelectedCandidates(int x, int y);
 	void cellClicked(int x, int y);
 	void moveChess(int src_x, int src_y, int dest_x, int dest_y);
+	void updatePieces();
 signals:
 
 public slots:
@@ -32,7 +33,7 @@ protected:
 private:
 	int cur_x, cur_y;
 	int cell_status[10][10];
-	std::shared_ptr<ChessPiece> cells[10][10];
+	ChessPiece *cells[10][10];
 	std::shared_ptr<Draughts> draughts;
 };
 

@@ -72,8 +72,8 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
 			}
 		}
 	} else {
-		int dxs[] = { 1, 1, -1, 1 };
-		int dys[] = { 1, -1, 1, 1 };
+		int dxs[] = { 1, 1, -1, -1 };
+		int dys[] = { 1, -1, 1, -1 };
 		for(int i = 0; i != 4; ++i)
 		{
 			int nx = x + dxs[i], ny = y + dys[i];
@@ -115,10 +115,10 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 		&& status[src_x][src_y].type != DraughtsInfo::empty)
 		return {};
 
-	auto try_promote_king = [this] (DraughtsInfo& info, DraughtsInfo::Types player)
+	auto try_promote_king = [this] (DraughtsInfo& info)
 	{
-		int end_x = player == DraughtsInfo::black ? 9 : 0;
-		if(info.x == end_x && info.type != player)
+		int end_x = (info.type == DraughtsInfo::black) ? 9 : 0;
+		if(info.x == end_x)
 			info.is_king = true;
 	};
 
@@ -142,13 +142,13 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 				&& nx == dest_x && ny == dest_y)
 			{
 				move_chess();
-				try_promote_king(status[nx][ny], player);
+				try_promote_king(status[nx][ny]);
 				return { status[src_x][src_y], status[nx][ny] };
 			}
 		}
 	} else {
-		int dxs[] = { 1, 1, -1, 1 };
-		int dys[] = { 1, -1, 1, 1 };
+		int dxs[] = { 1, 1, -1, -1 };
+		int dys[] = { 1, -1, 1, -1 };
 		for(int i = 0; i != 4; ++i)
 		{
 			int nx = src_x + dxs[i], ny = src_y + dys[i];
@@ -157,7 +157,7 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 				if(nx == dest_x && ny == dest_y)
 				{
 					move_chess();
-					try_promote_king(status[nx][ny], player);
+					try_promote_king(status[nx][ny]);
 					return { status[src_x][src_y], status[nx][ny] };
 				}
 
@@ -184,7 +184,7 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 
 				trace.push_back(info[step]);
 				move_chess();
-				try_promote_king(status[dest_x][dest_y], player);
+				try_promote_king(status[dest_x][dest_y]);
 
 				return true;
 			}
