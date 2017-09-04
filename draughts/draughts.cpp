@@ -7,12 +7,20 @@ Draughts::Draughts()
 		for(int j = 0; j != 10; ++j)
 		{
 			int id = i * 10 + j + 1;
-			if((id & 1) && id <= 20)
+			if(((i ^ j) & 1) && id <= 40)
 				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::black);
-			else if((id & 1) && id >= 31)
+			else if(((i ^ j) & 1) && id >= 60)
 				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::white);
 			else status[i][j] = DraughtsInfo(i, j);
 		}
+}
+
+bool Draughts::is_empty(int x, int y) const
+{
+	if(check_coord_avail(x, y))
+		return status[x][y].type == DraughtsInfo::empty;
+
+	return true;
 }
 
 vector<DraughtsInfo> Draughts::get_avail_chess(DraughtsInfo::Types player)
@@ -26,7 +34,7 @@ vector<DraughtsInfo> Draughts::get_avail_chess(DraughtsInfo::Types player)
 			if(status[i][j].type != player)
 				continue;
 
-			auto pair_info = get_avail_move(i, j, player);
+			auto pair_info = get_avail_move(i, j);
 			if(cur_step == pair_info.first)
 			{
 				avail_chess.push_back(get_info(i, j));
@@ -40,13 +48,13 @@ vector<DraughtsInfo> Draughts::get_avail_chess(DraughtsInfo::Types player)
 	return avail_chess;
 }
 
-pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(
-	int x, int y, DraughtsInfo::Types player)
+pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
 {
 	if(!check_coord_avail(x, y))
 		return {};
 
 	int cur_step = 0;
+	auto player = status[x][y].type;
 	vector<DraughtsInfo> avail_move;
 
 	// non-eating move
@@ -57,8 +65,7 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(
 		for(int i = 0; i != 2; ++i)
 		{
 			int nx = x + dx, ny = y + dys[i];
-			if(check_coord_avail(nx, ny)
-				&& status[nx][ny].type == DraughtsInfo::empty)
+			if(check_coord_avail(nx, ny) && is_empty(nx, ny))
 			{
 				cur_step = 1;
 				avail_move.push_back(status[nx][ny]);
@@ -70,8 +77,7 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(
 		for(int i = 0; i != 4; ++i)
 		{
 			int nx = x + dxs[i], ny = y + dys[i];
-			while(check_coord_avail(nx, ny)
-				&& status[nx][ny].type == DraughtsInfo::empty)
+			while(check_coord_avail(nx, ny) && is_empty(nx, ny))
 			{
 				cur_step = 1;
 				avail_move.push_back(get_info(nx, ny));
@@ -85,12 +91,13 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(
 	dfs_jump(0, x, y, status[x][y].is_king, player,
 		[&](int step, DraughtsInfo* info, DraughtsInfo* eat) -> bool
 		{
-			if(step <= 1) return false;
-			if(cur_step == step)
+			int total_step = step * 2; // including eating steps
+			if(total_step <= 1) return false;
+			if(cur_step == total_step)
 			{
 				avail_move.push_back(info[step]);
-			} else if(cur_step < step) {
-				cur_step = step;
+			} else if(cur_step < total_step) {
+				cur_step = total_step;
 				avail_move.clear();
 				avail_move.push_back(info[step]);
 			}
@@ -115,6 +122,13 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 			info.is_king = true;
 	};
 
+	auto move_chess = [&] ()
+	{
+		status[dest_x][dest_y].type = status[src_x][src_y].type;
+		status[dest_x][dest_y].is_king = status[src_x][src_y].is_king;
+		status[src_x][src_y].set_empty();
+	};
+
 	// non-eating move
 	auto player = status[src_x][src_y].type;
 	if(!status[src_x][src_y].is_king)
@@ -124,12 +138,10 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 		for(int i = 0; i != 2; ++i)
 		{
 			int nx = src_x + dx, ny = src_y + dys[i];
-			if(check_coord_avail(nx, ny)
-				&& status[nx][ny].type == DraughtsInfo::empty
+			if(check_coord_avail(nx, ny) && is_empty(nx, ny)
 				&& nx == dest_x && ny == dest_y)
 			{
-				status[nx][ny] = status[src_x][src_y];
-				status[src_x][src_y].set_empty();
+				move_chess();
 				try_promote_king(status[nx][ny], player);
 				return { status[src_x][src_y], status[nx][ny] };
 			}
@@ -140,13 +152,11 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 		for(int i = 0; i != 4; ++i)
 		{
 			int nx = src_x + dxs[i], ny = src_y + dys[i];
-			while(check_coord_avail(nx, ny)
-				&& status[nx][ny].type == DraughtsInfo::empty)
+			while(check_coord_avail(nx, ny) && is_empty(nx, ny))
 			{
 				if(nx == dest_x && ny == dest_y)
 				{
-					status[nx][ny] = status[src_x][src_y];
-					status[src_x][src_y].set_empty();
+					move_chess();
 					try_promote_king(status[nx][ny], player);
 					return { status[src_x][src_y], status[nx][ny] };
 				}
@@ -162,19 +172,18 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 	dfs_jump(0, src_x, src_y, status[src_x][src_y].is_king, player,
 		[&](int step, DraughtsInfo* info, DraughtsInfo* eat) -> bool
 		{
-			DraughtsInfo dest = status[dest_x][dest_y];
+			DraughtsInfo dest = info[step];
 			if(dest.x == dest_x && dest.y == dest_y)
 			{
 				for(int i = 0; i != step; ++i)
 				{
 					trace.push_back(info[i]);
 					trace.push_back(eat[i]);
-					eat[i].set_empty();
+					status[eat[i].x][eat[i].y].set_empty();
 				}
 
 				trace.push_back(info[step]);
-				status[dest_x][dest_y] = status[src_x][src_y];
-				status[src_x][src_y].set_empty();
+				move_chess();
 				try_promote_king(status[dest_x][dest_y], player);
 
 				return true;
@@ -203,11 +212,10 @@ bool Draughts::dfs_jump(
 			int ny1 = y + dys[i];
 			int nx2 = nx1 + dxs[i];
 			int ny2 = ny1 + dys[i];
-			if(!check_coord_avail(nx2, ny2) || !mark[nx1][ny1])
+			if(!check_coord_avail(nx2, ny2) || mark[nx1][ny1])
 				continue;
 
-			if(status[nx2][ny2].type == DraughtsInfo::empty
-				&& status[nx1][ny1].type != DraughtsInfo::empty
+			if(is_empty(nx2, ny2) && !is_empty(nx1, ny1)
 				&& status[nx1][ny1].type != type)
 			{
 				mark[nx1][ny1] = 1;
@@ -223,7 +231,7 @@ bool Draughts::dfs_jump(
 			int nx = x, ny = y;
 			do {
 				nx += dxs[i], ny += dys[i];
-				if(status[nx][ny].type != DraughtsInfo::empty)
+				if(!is_empty(nx, ny))
 				{
 					first_meet = status[nx][ny].type;
 					break;
@@ -237,8 +245,7 @@ bool Draughts::dfs_jump(
 				eat_info[step] = get_info(nx, ny);
 
 				int nx2 = nx + dxs[i], ny2 = ny + dys[i];
-				while(check_coord_avail(nx2, ny2)
-					&& status[nx2][ny2].type == DraughtsInfo::empty)
+				while(check_coord_avail(nx2, ny2) && is_empty(nx2, ny2))
 				{
 					if(dfs_jump(step + 1, nx2, ny2, is_king, type, callback))
 						return true;

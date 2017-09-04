@@ -30,10 +30,10 @@ public:
 	Draughts();
 
 	vector<DraughtsInfo> get_avail_chess(DraughtsInfo::Types player);
-	pair<int, vector<DraughtsInfo>> get_avail_move(
-		int x, int y, DraughtsInfo::Types player);
+	pair<int, vector<DraughtsInfo>> get_avail_move(int x, int y);
 	vector<DraughtsInfo> move(int src_x, int src_y, int dest_x, int dest_y);
 	DraughtsInfo get_info(int x, int y) const;
+	bool is_empty(int x, int y) const;
 
 private:
 	bool dfs_jump(

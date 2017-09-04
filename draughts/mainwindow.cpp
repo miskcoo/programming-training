@@ -18,6 +18,7 @@ void MainWindow::initWidgets()
 	QVBoxLayout *layout = new QVBoxLayout(window);
 
 	chess_board = new ChessBoard;
+	chess_board->initBoard();
 
 	layout->addWidget(chess_board);
 }

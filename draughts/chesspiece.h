@@ -3,6 +3,7 @@
 
 #include <QtWidgets>
 #include <QGraphicsEffect>
+#include "draughts.h"
 
 class ChessPiece : public QWidget
 {
@@ -10,8 +11,9 @@ class ChessPiece : public QWidget
 public:
 	explicit ChessPiece(QWidget *parent = 0);
 
-	void fadeOut(int milliseconds);
-	void moveAnimation(int x, int y, int milliseconds);
+	void fadeOut(qreal start, int milliseconds);
+	void moveAnimation(vector<QRect> dest_rects, int milliseconds);
+	void setPieceInfo(DraughtsInfo piece_info);
 
 signals:
 
@@ -21,6 +23,7 @@ protected:
 	void paintEvent(QPaintEvent *);
 
 private:
+	DraughtsInfo piece_info;
 	QGraphicsOpacityEffect *opacity_effect;
 };
 
