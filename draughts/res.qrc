@@ -6,5 +6,6 @@
         <file alias="black-piece">image/black-piece.png</file>
         <file alias="white-crown">image/white-crown.png</file>
         <file alias="black-crown">image/black-crown.png</file>
+        <file alias="sound">sound/sound.wav</file>
     </qresource>
 </RCC>

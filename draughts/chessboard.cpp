@@ -108,10 +108,6 @@ void ChessBoard::clearMarks(int cleard_mask)
 
 void ChessBoard::cellClicked(int x, int y)
 {
-	/* only for TEST
-	static DraughtsInfo::Types types = DraughtsInfo::white;
-	 only for TEST */
-
 	if(cur_player != player)
 		return;
 
@@ -159,16 +155,6 @@ void ChessBoard::cellClicked(int x, int y)
 			}
 		}
 	}
-
-	/* only for TEST
-	else
-	{
-		if(types == DraughtsInfo::white)
-			types = DraughtsInfo::black;
-		else types = DraughtsInfo::white;
-		markMoveCandidates(types);
-	}
-	 only for TEST */
 }
 
 void ChessBoard::applyTrace(const DraughtsTrace &trace)
@@ -265,23 +251,28 @@ void ChessBoard::paintEvent(QPaintEvent *ev)
 		}
 
 	// draw special cells
-	auto drawRectWithGradient = [&](QRect rect, QColor c_begin, QColor c_end, double depth)
+	auto drawRectWithGradient = [&](QRect rect, QColor c_begin, QColor c_end, double depth1, double depth2)
 	{
 		QLinearGradient gradient;
 		gradient.setColorAt(0, c_begin);
-		gradient.setColorAt(depth, c_end);
+		gradient.setColorAt(depth1, c_end);
 		gradient.setColorAt(1, c_end);
 
 		gradient.setStart(rect.topLeft());
 		gradient.setFinalStop(rect.topRight());
 		p.fillRect(rect, QBrush(gradient));
 
-		gradient.setStart(rect.topRight());
-		gradient.setFinalStop(rect.topLeft());
-		p.fillRect(rect, QBrush(gradient));
-
 		gradient.setStart(rect.topLeft());
 		gradient.setFinalStop(rect.bottomLeft());
+		p.fillRect(rect, QBrush(gradient));
+
+		gradient = QLinearGradient();
+		gradient.setColorAt(0, c_begin);
+		gradient.setColorAt(depth2, c_end);
+		gradient.setColorAt(1, c_end);
+
+		gradient.setStart(rect.topRight());
+		gradient.setFinalStop(rect.topLeft());
 		p.fillRect(rect, QBrush(gradient));
 
 		gradient.setStart(rect.bottomLeft());
@@ -300,11 +291,11 @@ void ChessBoard::paintEvent(QPaintEvent *ev)
 			{
 				drawRectWithGradient(gradient_cell_rect,
 									 QColor(0, 0, 0, 200),
-									 QColor(0, 0, 0, 0), 0.1);
+									 QColor(0, 0, 0, 0), 0.15, 0.1);
 			} else if(cell_status[i][j] & CELL_SELECT_CANDIDATE) {
 				drawRectWithGradient(gradient_cell_rect,
 									 QColor(255, 255, 255, 100),
-									 QColor(255, 255, 255, 0), 0.1);
+									 QColor(255, 255, 255, 0), 0.1, 0.1);
 				p.setPen(QPen(Qt::yellow, 2));
 				p.drawRect(cell_rect);
 			} else if(cell_status[i][j] & CELL_MOVE_CANDIDATE) {

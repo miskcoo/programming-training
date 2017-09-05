@@ -3,6 +3,7 @@
 
 ChessPiece::ChessPiece(QWidget *parent) : QWidget(parent)
 {
+	sound = new QSound(":sound", this);
 	opacity_effect = new QGraphicsOpacityEffect(this);
 	opacity_effect->setOpacity(1.0);
 	setGraphicsEffect(opacity_effect);
@@ -32,7 +33,7 @@ void ChessPiece::paintEvent(QPaintEvent *ev)
 	{
 		if(piece_info.type != player)
 		{
-			p.translate(rect().bottomRight());
+			p.translate(rect().bottomRight() + QPoint(1, 1));
 			p.rotate(180);
 		}
 		p.drawPixmap(rect(), *crown);
@@ -51,6 +52,7 @@ void ChessPiece::moveAnimation(vector<QRect> dest_rects, int milliseconds)
 	move_ani->setEndValue(dest_rects.back());
 	move_ani->setEasingCurve(QEasingCurve::BezierSpline);
 	move_ani->start(QPropertyAnimation::DeleteWhenStopped);
+	connect(move_ani, SIGNAL(destroyed(QObject*)), this, SLOT(moveFinished()));
 }
 
 void ChessPiece::fadeOut(qreal start, int milliseconds)
@@ -74,4 +76,9 @@ void ChessPiece::setPlayer(DraughtsInfo::Types player)
 {
 	this->player = player;
 	update();
+}
+
+void ChessPiece::moveFinished()
+{
+	sound->play();
 }

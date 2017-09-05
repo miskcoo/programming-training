@@ -3,6 +3,7 @@
 
 #include <QtWidgets>
 #include <QGraphicsEffect>
+#include <QSound>
 #include "draughts.h"
 
 class ChessPiece : public QWidget
@@ -19,11 +20,13 @@ public:
 signals:
 
 public slots:
+	void moveFinished();
 
 protected:
 	void paintEvent(QPaintEvent *);
 
 private:
+	QSound *sound;
 	DraughtsInfo piece_info;
 	DraughtsInfo::Types player;
 	QGraphicsOpacityEffect *opacity_effect;

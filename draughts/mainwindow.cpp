@@ -28,7 +28,9 @@ void MainWindow::initWidgets()
 	layout->addWidget(chess_board);
 
 	info_label = new QLabel;
-	layout->addWidget(info_label);
+	info_label->setMargin(0);
+	ui->statusBar->addWidget(info_label);
+	ui->statusBar->setSizeGripEnabled(false);
 
 	connect(chess_board, SIGNAL(noAvailChess()), this, SLOT(gameEnd()));
 	connect(chess_board, SIGNAL(playerMove(int,int,int,int)),
