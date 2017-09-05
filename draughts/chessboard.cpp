@@ -10,6 +10,7 @@ ChessBoard::ChessBoard(QWidget *parent)
 {
 	setFixedSize(501, 501);
 	std::memset(cells, 0, sizeof(cells));
+	std::memset(cell_status, 0, sizeof(cell_status));
 }
 
 void ChessBoard::initBoard()
@@ -25,12 +26,24 @@ void ChessBoard::initBoard()
 			if(!draughts->is_empty(i, j))
 			{
 				cells[i][j] = new ChessPiece(this);
+				cells[i][j]->show();
 				cells[i][j]->setGeometry(getCellRect(i, j));
 			} else cells[i][j] = nullptr;
 		}
 	}
 
 	updatePieces();
+}
+
+void ChessBoard::startGame(DraughtsInfo::Types player)
+{
+	this->player = player;
+	this->cur_player = DraughtsInfo::black;
+
+	initBoard();
+
+	if(cur_player == player)
+		markMoveCandidates(player);
 }
 
 void ChessBoard::updatePieces()
@@ -43,6 +56,8 @@ void ChessBoard::updatePieces()
 
 QRect ChessBoard::getCellRect(int row, int col)
 {
+	if(player == DraughtsInfo::black)
+		row = 9 - row, col = 9 - col;
 	int cell_width = (width() - 1) / 10;
 	int cell_height = (height() - 1) / 10;
 	return QRect(cell_width * col, cell_height * row, cell_width, cell_height);
@@ -59,7 +74,14 @@ pair<int, int> ChessBoard::mapMouseToCell(QPoint mouse)
 
 void ChessBoard::markMoveCandidates(DraughtsInfo::Types player)
 {
-	for(auto piece_info : draughts->get_avail_chess(player))
+	auto avail_chess = draughts->get_avail_chess(player);
+	if(avail_chess.empty())
+	{
+		emit noAvailChess();
+		return;
+	}
+
+	for(auto piece_info : avail_chess)
 		cell_status[piece_info.x][piece_info.y] |= CELL_MOVE_CANDIDATE;
 	update();
 }
@@ -82,9 +104,12 @@ void ChessBoard::clearMarks(int cleard_mask)
 
 void ChessBoard::cellClicked(int x, int y)
 {
-	/* only for TEST */
+	/* only for TEST
 	static DraughtsInfo::Types types = DraughtsInfo::white;
-	/* only for TEST */
+	 only for TEST */
+
+	if(cur_player != player)
+		return;
 
 	if(cell_status[x][y] == CELL_MOVE_CANDIDATE)
 	{
@@ -92,11 +117,15 @@ void ChessBoard::cellClicked(int x, int y)
 		markSelectedCandidates(x, y);
 		cur_x = x, cur_y = y;
 	} else if(cell_status[x][y] & CELL_SELECT_CANDIDATE) {
-		clearMarks();
-		moveChess(cur_x, cur_y, x, y);
+		if(draughts->is_empty(x, y))
+		{
+			clearMarks();
+			if(moveChess(cur_x, cur_y, x, y))
+				emit playerMove(cur_x, cur_y, x, y);
+		}
 	}
 
-	/* only for TEST */
+	/* only for TEST
 	else
 	{
 		if(types == DraughtsInfo::white)
@@ -104,13 +133,15 @@ void ChessBoard::cellClicked(int x, int y)
 		else types = DraughtsInfo::white;
 		markMoveCandidates(types);
 	}
-	/* only for TEST */
+	 only for TEST */
 }
 
-void ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
+bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 {
 	auto trace = draughts->move(src_x, src_y, dest_x, dest_y);
-	if(trace.empty()) return;
+	if(trace.empty()) return false;
+
+	clearMarks(CELL_MOVE_TRACE);
 
 	if(trace.size() == 2)
 	{
@@ -118,12 +149,19 @@ void ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 		cells[dest_x][dest_y] = cells[src_x][src_y];
 		cells[src_x][src_y] = nullptr;
 
+		cell_status[dest_x][dest_y] = CELL_MOVE_TRACE;
+		cell_status[src_x][src_y] = CELL_MOVE_TRACE;
+
 		cells[dest_x][dest_y]->moveAnimation( { getCellRect(dest_x, dest_y) }, 400);
 	} else if(trace.size() > 2) {
 		// eating move
 		vector<QRect> move_seq;
+		cell_status[src_x][src_y] = CELL_MOVE_TRACE;
 		for(size_t i = 2; i < trace.size(); i += 2)
+		{
 			move_seq.push_back(getCellRect(trace[i].x, trace[i].y));
+			cell_status[trace[i].x][trace[i].y] = CELL_MOVE_TRACE;
+		}
 
 		for(size_t i = 1; i < trace.size(); i += 2)
 		{
@@ -137,7 +175,15 @@ void ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 		cells[dest_x][dest_y]->moveAnimation(move_seq, 400);
 	}
 
+	if(cur_player == DraughtsInfo::black)
+		cur_player = DraughtsInfo::white;
+	else cur_player = DraughtsInfo::black;
+
+	if(cur_player == player)
+		markMoveCandidates(player);
+
 	updatePieces();
+	return true;
 }
 
 void ChessBoard::mouseReleaseEvent(QMouseEvent *ev)

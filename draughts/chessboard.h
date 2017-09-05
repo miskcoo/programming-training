@@ -21,9 +21,15 @@ public:
 	void markMoveCandidates(DraughtsInfo::Types player);
 	void markSelectedCandidates(int x, int y);
 	void cellClicked(int x, int y);
-	void moveChess(int src_x, int src_y, int dest_x, int dest_y);
+	bool moveChess(int src_x, int src_y, int dest_x, int dest_y);
 	void updatePieces();
+
+	void startGame(DraughtsInfo::Types player);
+	DraughtsInfo::Types getPlayer() { return player; }
+	DraughtsInfo::Types getCurrentPlayer() { return cur_player; }
 signals:
+	void playerMove(int, int, int, int);
+	void noAvailChess();
 
 public slots:
 
@@ -34,6 +40,7 @@ private:
 	int cur_x, cur_y;
 	int cell_status[10][10];
 	ChessPiece *cells[10][10];
+	DraughtsInfo::Types player, cur_player;
 	std::shared_ptr<Draughts> draughts;
 };
 
