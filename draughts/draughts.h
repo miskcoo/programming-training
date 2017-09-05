@@ -24,14 +24,16 @@ struct DraughtsInfo
 	void set_empty() { type = empty, is_king = false; }
 };
 
+typedef vector<DraughtsInfo> DraughtsTrace;
+
 class Draughts
 {
 public:
 	Draughts();
 
 	vector<DraughtsInfo> get_avail_chess(DraughtsInfo::Types player);
-	pair<int, vector<DraughtsInfo>> get_avail_move(int x, int y);
-	vector<DraughtsInfo> move(int src_x, int src_y, int dest_x, int dest_y);
+	pair<int, vector<DraughtsTrace>> get_avail_move(int x, int y);
+	DraughtsTrace move(int src_x, int src_y, int dest_x, int dest_y);
 	DraughtsInfo get_info(int x, int y) const;
 	bool is_empty(int x, int y) const;
 

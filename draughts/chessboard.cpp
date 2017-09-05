@@ -86,10 +86,19 @@ void ChessBoard::markMoveCandidates(DraughtsInfo::Types player)
 	update();
 }
 
-void ChessBoard::markSelectedCandidates(int x, int y)
+void ChessBoard::markAvailTraces()
 {
-	for(auto piece_info : draughts->get_avail_move(x, y).second)
+	if(avail_traces.empty()) return;
+	for(const DraughtsTrace& trace : avail_traces)
+	{
+		DraughtsInfo piece_info;
+		if(trace.size() == 2)
+			piece_info = trace.back();
+		else piece_info = trace[2];
 		cell_status[piece_info.x][piece_info.y] |= CELL_SELECT_CANDIDATE;
+	}
+
+	int x = avail_traces[0][0].x, y = avail_traces[0][0].y;
 	cell_status[x][y] |= CELL_SELECT_CANDIDATE;
 	update();
 }
@@ -113,15 +122,46 @@ void ChessBoard::cellClicked(int x, int y)
 
 	if(cell_status[x][y] == CELL_MOVE_CANDIDATE)
 	{
-		clearMarks(CELL_SELECT_CANDIDATE);
-		markSelectedCandidates(x, y);
+		clearMarks(CELL_SELECT_CANDIDATE | CELL_MOVE_TRACE);
+		avail_traces = draughts->get_avail_move(x, y).second;
+		long_term_move = false;
+		markAvailTraces();
 		cur_x = x, cur_y = y;
 	} else if(cell_status[x][y] & CELL_SELECT_CANDIDATE) {
 		if(draughts->is_empty(x, y))
 		{
+			int trace_len = avail_traces.front().size();
 			clearMarks();
-			if(moveChess(cur_x, cur_y, x, y))
-				emit playerMove(cur_x, cur_y, x, y);
+			if(trace_len <= 3 && !long_term_move)
+			{
+				// one-step move
+				if(moveChess(cur_x, cur_y, x, y))
+					emit playerMove(cur_x, cur_y, x, y);
+			} else {
+				// multi-step move
+				long_term_move = true;
+				DraughtsTrace sub_trace;
+				for(auto it = avail_traces.begin(); it != avail_traces.end(); ++it)
+				{
+					DraughtsTrace& trace = *it;
+					if(trace[2].x == x && trace[2].y == y)
+					{
+						sub_trace.assign(trace.begin(), trace.begin() + 3);
+						trace.erase(trace.begin(), trace.begin() + 2);
+					} else {
+						it = avail_traces.erase(it);
+					}
+				}
+
+				applyTrace(sub_trace);
+				if(trace_len <= 3)
+				{
+					// last move, apply to Draughts
+					if(moveChess(cur_x, cur_y, x, y))
+						emit playerMove(cur_x, cur_y, x, y);
+					long_term_move = false;
+				} else markAvailTraces();
+			}
 		}
 	}
 
@@ -136,13 +176,13 @@ void ChessBoard::cellClicked(int x, int y)
 	 only for TEST */
 }
 
-bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
+void ChessBoard::applyTrace(const DraughtsTrace &trace)
 {
-	auto trace = draughts->move(src_x, src_y, dest_x, dest_y);
-	if(trace.empty()) return false;
-
+	if(trace.empty()) return;
 	clearMarks(CELL_MOVE_TRACE);
 
+	int src_x = trace.front().x, src_y = trace.front().y;
+	int dest_x = trace.back().x, dest_y = trace.back().y;
 	if(trace.size() == 2)
 	{
 		// non-eating move
@@ -174,6 +214,14 @@ bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 
 		cells[dest_x][dest_y]->moveAnimation(move_seq, 400);
 	}
+}
+
+bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
+{
+	auto trace = draughts->move(src_x, src_y, dest_x, dest_y);
+	if(trace.empty()) return false;
+
+	if(!long_term_move) applyTrace(trace);
 
 	if(cur_player == DraughtsInfo::black)
 		cur_player = DraughtsInfo::white;

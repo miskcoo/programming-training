@@ -19,9 +19,10 @@ public:
 
 	void clearMarks(int cleard_mask = ~0u >> 1);
 	void markMoveCandidates(DraughtsInfo::Types player);
-	void markSelectedCandidates(int x, int y);
+	void markAvailTraces();
 	void cellClicked(int x, int y);
 	bool moveChess(int src_x, int src_y, int dest_x, int dest_y);
+	void applyTrace(const DraughtsTrace& trace);
 	void updatePieces();
 
 	void startGame(DraughtsInfo::Types player);
@@ -37,9 +38,11 @@ protected:
 	void paintEvent(QPaintEvent *);
 	void mouseReleaseEvent(QMouseEvent *);
 private:
+	bool long_term_move;
 	int cur_x, cur_y;
 	int cell_status[10][10];
 	ChessPiece *cells[10][10];
+	vector<DraughtsTrace> avail_traces;
 	DraughtsInfo::Types player, cur_player;
 	std::shared_ptr<Draughts> draughts;
 };

@@ -83,6 +83,14 @@ void MainWindow::recvMessage()
 		int src_x, src_y, dest_x, dest_y;
 		os >> src_x >> src_y >> dest_x >> dest_y;
 		chess_board->moveChess(src_x, src_y, dest_x, dest_y);
+
+		QString text = QString("%1 %2 %3 %4 %5")
+				.arg(OPER_MOVE,
+					 QString::number(src_x),
+					 QString::number(src_y),
+					 QString::number(dest_x),
+					 QString::number(dest_y));
+		info_label->setText(text);
 	} else if(oper == OPER_GIVEUP) {
 		gameEnd();
 		chess_board->clearMarks();

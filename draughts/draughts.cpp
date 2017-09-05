@@ -48,14 +48,14 @@ vector<DraughtsInfo> Draughts::get_avail_chess(DraughtsInfo::Types player)
 	return avail_chess;
 }
 
-pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
+pair<int, vector<DraughtsTrace>> Draughts::get_avail_move(int x, int y)
 {
 	if(!check_coord_avail(x, y))
 		return {};
 
 	int cur_step = 0;
 	auto player = status[x][y].type;
-	vector<DraughtsInfo> avail_move;
+	vector<DraughtsTrace> avail_move;
 
 	// non-eating move
 	if(!status[x][y].is_king)
@@ -68,7 +68,7 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
 			if(check_coord_avail(nx, ny) && is_empty(nx, ny))
 			{
 				cur_step = 1;
-				avail_move.push_back(status[nx][ny]);
+				avail_move.push_back({ get_info(x, y), get_info(nx, ny) });
 			}
 		}
 	} else {
@@ -80,7 +80,7 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
 			while(check_coord_avail(nx, ny) && is_empty(nx, ny))
 			{
 				cur_step = 1;
-				avail_move.push_back(get_info(nx, ny));
+				avail_move.push_back({ get_info(x, y), get_info(nx, ny) });
 				nx += dxs[i], ny += dys[i];
 			}
 		}
@@ -93,13 +93,21 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
 		{
 			int total_step = step * 2; // including eating steps
 			if(total_step <= 1) return false;
+			DraughtsTrace trace;
+			for(int i = 0; i != step; ++i)
+			{
+				trace.push_back(info[i]);
+				trace.push_back(eat[i]);
+			}
+			trace.push_back(info[step]);
+
 			if(cur_step == total_step)
 			{
-				avail_move.push_back(info[step]);
+				avail_move.push_back(trace);
 			} else if(cur_step < total_step) {
 				cur_step = total_step;
 				avail_move.clear();
-				avail_move.push_back(info[step]);
+				avail_move.push_back(trace);
 			}
 
 			return false;
@@ -108,7 +116,7 @@ pair<int, vector<DraughtsInfo>> Draughts::get_avail_move(int x, int y)
 	return { cur_step, avail_move };
 }
 
-vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y)
+DraughtsTrace Draughts::move(int src_x, int src_y, int dest_x, int dest_y)
 {
 	if(!check_coord_avail(src_x, src_y) 
 		&& !check_coord_avail(dest_x, dest_y)
@@ -167,7 +175,7 @@ vector<DraughtsInfo> Draughts::move(int src_x, int src_y, int dest_x, int dest_y
 	}
 
 	// eating move
-	vector<DraughtsInfo> trace;
+	DraughtsTrace trace;
 	std::memset(mark, 0, sizeof(mark));
 	dfs_jump(0, src_x, src_y, status[src_x][src_y].is_king, player,
 		[&](int step, DraughtsInfo* info, DraughtsInfo* eat) -> bool
