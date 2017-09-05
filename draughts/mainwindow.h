@@ -28,10 +28,11 @@ public slots:
 private slots:
 	void connectedToHost();
 	void acceptConnection();
-	void socketError(QTcpSocket::SocketError);
 	void recvMessage();
 	void playerMove(int, int, int, int);
 	void gameEnd();
+
+	void on_actionGive_Up_triggered();
 
 private:
 	Ui::MainWindow *ui;

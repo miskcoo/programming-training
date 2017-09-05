@@ -11,6 +11,7 @@ class ChessPiece : public QWidget
 public:
 	explicit ChessPiece(QWidget *parent = 0);
 
+	void setPlayer(DraughtsInfo::Types player);
 	void fadeOut(qreal start, int milliseconds);
 	void moveAnimation(vector<QRect> dest_rects, int milliseconds);
 	void setPieceInfo(DraughtsInfo piece_info);
@@ -24,6 +25,7 @@ protected:
 
 private:
 	DraughtsInfo piece_info;
+	DraughtsInfo::Types player;
 	QGraphicsOpacityEffect *opacity_effect;
 };
 

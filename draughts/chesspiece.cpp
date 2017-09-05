@@ -12,13 +12,30 @@ void ChessPiece::paintEvent(QPaintEvent *ev)
 {
 	QPainter p(this);
 
+	static QPixmap black_piece(":black-piece");
+	static QPixmap white_piece(":white-piece");
+	static QPixmap black_crown(":black-crown");
+	static QPixmap white_crown(":white-crown");
+
+	QPixmap *crown = nullptr;
+
 	if(piece_info.type == DraughtsInfo::black)
 	{
-		p.setBrush(QBrush(Qt::red, piece_info.is_king ? Qt::Dense3Pattern : Qt::SolidPattern));
-		p.drawEllipse(rect().adjusted(5, 5, -5, -5));
+		p.drawPixmap(rect(), black_piece);
+		crown = &white_crown;
 	} else if(piece_info.type == DraughtsInfo::white) {
-		p.setBrush(QBrush(Qt::yellow, piece_info.is_king ? Qt::Dense3Pattern : Qt::SolidPattern));
-		p.drawEllipse(rect().adjusted(5, 5, -5, -5));
+		p.drawPixmap(rect(), white_piece);
+		crown = &black_crown;
+	}
+
+	if(piece_info.is_king && crown)
+	{
+		if(piece_info.type != player)
+		{
+			p.translate(rect().bottomRight());
+			p.rotate(180);
+		}
+		p.drawPixmap(rect(), *crown);
 	}
 
 	QWidget::paintEvent(ev);
@@ -50,5 +67,11 @@ void ChessPiece::fadeOut(qreal start, int milliseconds)
 void ChessPiece::setPieceInfo(DraughtsInfo piece_info)
 {
 	this->piece_info = piece_info;
+	update();
+}
+
+void ChessPiece::setPlayer(DraughtsInfo::Types player)
+{
+	this->player = player;
 	update();
 }

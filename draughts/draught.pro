@@ -29,3 +29,6 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     login_dialog.ui
+
+RESOURCES += \
+    res.qrc

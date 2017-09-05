@@ -35,10 +35,6 @@ void MainWindow::initWidgets()
 			this, SLOT(playerMove(int,int,int,int)));
 }
 
-void MainWindow::socketError(QTcpSocket::SocketError)
-{
-}
-
 void MainWindow::connectToServer()
 {
 	LoginDialog dlg;
@@ -52,8 +48,6 @@ void MainWindow::connectToServer()
 			info_label->setText("Connecting...");
 			connect(rw_socket, SIGNAL(connected()), this, SLOT(connectedToHost()));
 			connect(rw_socket, SIGNAL(readyRead()), this, SLOT(recvMessage()));
-			connect(rw_socket, SIGNAL(error(QAbstractSocket::SocketError)),
-					this, SLOT(socketError(QTcpSocket::SocketError)));
 		} else {
 			QMessageBox::warning(this, "Error", "Error: Invalid address!");
 		}
@@ -92,7 +86,7 @@ void MainWindow::recvMessage()
 					 QString::number(dest_y));
 		info_label->setText(text);
 	} else if(oper == OPER_GIVEUP) {
-		gameEnd();
+		QMessageBox::information(this, "Game Over", "Congratulations! You win!");
 		chess_board->clearMarks();
 	}
 }
@@ -146,4 +140,13 @@ void MainWindow::gameEnd()
 MainWindow::~MainWindow()
 {
 	delete ui;
+}
+
+void MainWindow::on_actionGive_Up_triggered()
+{
+   if(rw_socket)
+   {
+	   rw_socket->write(OPER_GIVEUP);
+	   QMessageBox::information(this, "Game Over", "You lost!");
+   }
 }

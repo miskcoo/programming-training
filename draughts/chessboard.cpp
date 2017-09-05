@@ -28,6 +28,7 @@ void ChessBoard::initBoard()
 				cells[i][j] = new ChessPiece(this);
 				cells[i][j]->show();
 				cells[i][j]->setGeometry(getCellRect(i, j));
+				cells[i][j]->setPlayer(player);
 			} else cells[i][j] = nullptr;
 		}
 	}
@@ -75,12 +76,6 @@ pair<int, int> ChessBoard::mapMouseToCell(QPoint mouse)
 void ChessBoard::markMoveCandidates(DraughtsInfo::Types player)
 {
 	auto avail_chess = draughts->get_avail_chess(player);
-	if(avail_chess.empty())
-	{
-		emit noAvailChess();
-		return;
-	}
-
 	for(auto piece_info : avail_chess)
 		cell_status[piece_info.x][piece_info.y] |= CELL_MOVE_CANDIDATE;
 	update();
@@ -221,6 +216,8 @@ bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 	auto trace = draughts->move(src_x, src_y, dest_x, dest_y);
 	if(trace.empty()) return false;
 
+	qDebug() << "MOVE " << src_x << " " << src_y << " " << dest_x << " " << dest_y;
+
 	if(!long_term_move) applyTrace(trace);
 
 	if(cur_player == DraughtsInfo::black)
@@ -231,6 +228,10 @@ bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
 		markMoveCandidates(player);
 
 	updatePieces();
+
+	if(draughts->get_avail_chess(cur_player).empty())
+		emit noAvailChess();
+
 	return true;
 }
 
@@ -251,8 +252,8 @@ void ChessBoard::paintEvent(QPaintEvent *ev)
 	QPainter p(this);
 
 	// draw basic background
-	QBrush dark_cell_brush(qRgb(160, 160, 160)),
-		   light_cell_brush(qRgb(200, 200, 200));
+	static QBrush dark_cell_brush(QPixmap(":dark-bg"));
+	static QBrush light_cell_brush(QPixmap(":light-bg"));
 
 	for(int i = 0; i != 10; ++i)
 		for(int j = 0; j != 10; ++j)
