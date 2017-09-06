@@ -1,7 +1,6 @@
 #ifndef DRAUGHTS_H
 #define DRAUGHTS_H
 
-#include "utils.h"
 #include <vector>
 #include <utility>
 #include <functional>

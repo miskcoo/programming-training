@@ -50,19 +50,18 @@ void ChessPiece::moveAnimation(vector<QRect> dest_rects, int milliseconds)
 	for(int i = 0; i + 1 < (int)dest_rects.size(); ++i)
 		move_ani->setKeyValueAt((i + 1.0) / dest_rects.size(), dest_rects[i]);
 	move_ani->setEndValue(dest_rects.back());
-	move_ani->setEasingCurve(QEasingCurve::BezierSpline);
 	move_ani->start(QPropertyAnimation::DeleteWhenStopped);
 	connect(move_ani, SIGNAL(destroyed(QObject*)), this, SLOT(moveFinished()));
 }
 
-void ChessPiece::fadeOut(qreal start, int milliseconds)
+void ChessPiece::fadeOut(qreal start, qreal end, int milliseconds)
 {
 	QPropertyAnimation *opacity_ani = new QPropertyAnimation(opacity_effect, "opacity");
 	opacity_ani->setDuration(milliseconds);
 	opacity_ani->setStartValue(1);
 	opacity_ani->setKeyValueAt(start, 1);
+	opacity_ani->setKeyValueAt(end, 0);
 	opacity_ani->setEndValue(0);
-	opacity_ani->setEasingCurve(QEasingCurve::OutBack);
 	opacity_ani->start(QPropertyAnimation::DeleteWhenStopped);
 }
 

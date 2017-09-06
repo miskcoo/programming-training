@@ -17,6 +17,7 @@ void ChessBoard::initBoard(Draughts *game)
 {
 	std::memset(cell_status, 0, sizeof(cell_status));
 
+	long_term_move = false;
 	draughts = std::make_shared<Draughts>();
 	if(game) *draughts = *game;
 	for(int i = 0; i != 10; ++i)
@@ -196,7 +197,8 @@ void ChessBoard::applyTrace(const DraughtsTrace &trace)
 		for(size_t i = 1; i < trace.size(); i += 2)
 		{
 			qreal start = 1.0 * (i / 2) / (trace.size() / 2);
-			cells[trace[i].x][trace[i].y]->fadeOut(start, ANIMATION_TIME * (trace.size() / 2));
+			qreal end = 1.0 * (i / 2 + 0.5) / (trace.size() / 2);
+			cells[trace[i].x][trace[i].y]->fadeOut(start, end, ANIMATION_TIME * (trace.size() / 2));
 		}
 
 		cells[dest_x][dest_y] = cells[src_x][src_y];
