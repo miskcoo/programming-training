@@ -116,8 +116,12 @@ pair<int, vector<DraughtsTrace>> Draughts::get_avail_move(int x, int y)
 	return { cur_step, avail_move };
 }
 
-DraughtsTrace Draughts::move(int src_x, int src_y, int dest_x, int dest_y)
+DraughtsTrace Draughts::move(const vector<pair<int, int>>& move_trace)
 {
+	if(move_trace.size() < 2) return {};
+	int src_x = move_trace.front().first, src_y = move_trace.front().second;
+	int dest_x = move_trace.back().first, dest_y = move_trace.back().second;
+
 	if(!check_coord_avail(src_x, src_y) 
 		&& !check_coord_avail(dest_x, dest_y)
 		&& status[src_x][src_y].type != DraughtsInfo::empty)
@@ -180,9 +184,11 @@ DraughtsTrace Draughts::move(int src_x, int src_y, int dest_x, int dest_y)
 	dfs_jump(0, src_x, src_y, status[src_x][src_y].is_king, player,
 		[&](int step, DraughtsInfo* info, DraughtsInfo* eat) -> bool
 		{
-			DraughtsInfo dest = info[step];
-			if(dest.x == dest_x && dest.y == dest_y)
+			if(step + 1 == (int)move_trace.size())
 			{
+				for(int i = 0; i <= step; ++i)
+					if(info[i].x != move_trace[i].first || info[i].y != move_trace[i].second)
+						return false;
 				for(int i = 0; i != step; ++i)
 				{
 					trace.push_back(info[i]);

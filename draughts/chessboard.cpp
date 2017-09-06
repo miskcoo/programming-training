@@ -126,8 +126,9 @@ void ChessBoard::cellClicked(int x, int y)
 			if(trace_len <= 3 && !long_term_move)
 			{
 				// one-step move
-				if(moveChess(cur_x, cur_y, x, y))
-					emit playerMove(cur_x, cur_y, x, y);
+				vector<pair<int, int>> move_trace{{ cur_x, cur_y }, { x, y }};
+				if(moveChess(move_trace))
+					emit playerMove(move_trace);
 			} else {
 				// multi-step move
 				long_term_move = true;
@@ -139,6 +140,7 @@ void ChessBoard::cellClicked(int x, int y)
 					{
 						sub_trace.assign(trace.begin(), trace.begin() + 3);
 						trace.erase(trace.begin(), trace.begin() + 2);
+						cur_move_trace.push_back({x, y});
 					} else {
 						it = avail_traces.erase(it);
 					}
@@ -148,9 +150,11 @@ void ChessBoard::cellClicked(int x, int y)
 				if(trace_len <= 3)
 				{
 					// last move, apply to Draughts
-					if(moveChess(cur_x, cur_y, x, y))
-						emit playerMove(cur_x, cur_y, x, y);
+					cur_move_trace.insert(cur_move_trace.begin(), { cur_x, cur_y });
+					if(moveChess(cur_move_trace))
+						emit playerMove(cur_move_trace);
 					long_term_move = false;
+					cur_move_trace.clear();
 				} else markAvailTraces();
 			}
 		}
@@ -197,11 +201,14 @@ void ChessBoard::applyTrace(const DraughtsTrace &trace)
 	}
 }
 
-bool ChessBoard::moveChess(int src_x, int src_y, int dest_x, int dest_y)
+bool ChessBoard::moveChess(const vector<pair<int, int>>& move_trace)
 {
-	auto trace = draughts->move(src_x, src_y, dest_x, dest_y);
+	if(move_trace.size() < 2) return false;
+	auto trace = draughts->move(move_trace);
 	if(trace.empty()) return false;
 
+	int src_x = move_trace.front().first, src_y = move_trace.front().second;
+	int dest_x = move_trace.back().first, dest_y = move_trace.back().second;
 	qDebug() << "MOVE " << src_x << " " << src_y << " " << dest_x << " " << dest_y;
 
 	if(!long_term_move) applyTrace(trace);

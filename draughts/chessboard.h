@@ -21,7 +21,7 @@ public:
 	void markMoveCandidates(DraughtsInfo::Types player);
 	void markAvailTraces();
 	void cellClicked(int x, int y);
-	bool moveChess(int src_x, int src_y, int dest_x, int dest_y);
+	bool moveChess(const vector<pair<int, int>>&);
 	void applyTrace(const DraughtsTrace& trace);
 	void updatePieces();
 
@@ -29,7 +29,7 @@ public:
 	DraughtsInfo::Types getPlayer() { return player; }
 	DraughtsInfo::Types getCurrentPlayer() { return cur_player; }
 signals:
-	void playerMove(int, int, int, int);
+	void playerMove(vector<pair<int, int>>);
 	void noAvailChess();
 
 public slots:
@@ -43,6 +43,7 @@ private:
 	int cell_status[10][10];
 	ChessPiece *cells[10][10];
 	vector<DraughtsTrace> avail_traces;
+	vector<pair<int, int>> cur_move_trace;
 	DraughtsInfo::Types player, cur_player;
 	std::shared_ptr<Draughts> draughts;
 };

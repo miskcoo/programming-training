@@ -29,7 +29,7 @@ private slots:
 	void connectedToHost();
 	void acceptConnection();
 	void recvMessage();
-	void playerMove(int, int, int, int);
+	void playerMove(vector<pair<int, int>>);
 	void gameEnd();
 
 	void on_actionGive_Up_triggered();

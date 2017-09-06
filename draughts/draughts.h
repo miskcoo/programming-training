@@ -33,7 +33,7 @@ public:
 
 	vector<DraughtsInfo> get_avail_chess(DraughtsInfo::Types player);
 	pair<int, vector<DraughtsTrace>> get_avail_move(int x, int y);
-	DraughtsTrace move(int src_x, int src_y, int dest_x, int dest_y);
+	DraughtsTrace move(const vector<pair<int, int>>&);
 	DraughtsInfo get_info(int x, int y) const;
 	bool is_empty(int x, int y) const;
 

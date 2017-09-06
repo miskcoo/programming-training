@@ -131,6 +131,6 @@ Draughts是一款利用Qt实现的国际跳棋游戏，支持双人在线对战�
 
 对于网络的协议，我们简单用可见字符来传输数据，以{\it 操作名+参数}的格式进行通信。例如，对于移动棋子，数据传输格式就是
 \begin{center}
-	MOVE {\it <src\_x> <src\_y> <dest\_x> <dest\_y>}
+	MOVE {\it <length of moving trace> <pairs of (x, y)>}
 \end{center}
 \end{document}

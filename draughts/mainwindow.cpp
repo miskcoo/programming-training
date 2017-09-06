@@ -33,8 +33,8 @@ void MainWindow::initWidgets()
 	ui->statusBar->setSizeGripEnabled(false);
 
 	connect(chess_board, SIGNAL(noAvailChess()), this, SLOT(gameEnd()));
-	connect(chess_board, SIGNAL(playerMove(int,int,int,int)),
-			this, SLOT(playerMove(int,int,int,int)));
+	connect(chess_board, SIGNAL(playerMove(vector<pair<int,int> >)),
+			this, SLOT(playerMove(vector<pair<int,int> >)));
 }
 
 void MainWindow::connectToServer()
@@ -56,14 +56,15 @@ void MainWindow::connectToServer()
 	}
 }
 
-void MainWindow::playerMove(int src_x, int src_y, int dest_x, int dest_y)
+void MainWindow::playerMove(vector<pair<int, int>> move_trace)
 {
-	QString text = QString("%1 %2 %3 %4 %5")
+	QString text = QString("%1 %2")
 			.arg(OPER_MOVE,
-				 QString::number(src_x),
-				 QString::number(src_y),
-				 QString::number(dest_x),
-				 QString::number(dest_y));
+				 QString::number(move_trace.size()));
+	for(auto pos : move_trace)
+		text += QString(" %1 %2")
+				.arg(QString::number(pos.first),
+					 QString::number(pos.second));
 	rw_socket->write(text.toUtf8());
 //	qDebug() << text;
 }
@@ -76,17 +77,17 @@ void MainWindow::recvMessage()
 	os >> oper;
 	if(oper == OPER_MOVE)
 	{
-		int src_x, src_y, dest_x, dest_y;
-		os >> src_x >> src_y >> dest_x >> dest_y;
-		chess_board->moveChess(src_x, src_y, dest_x, dest_y);
+		int trace_len;
+		vector<pair<int, int>> move_trace;
+		os >> trace_len;
+		for(int i = 0; i != trace_len; ++i)
+		{
+			int x, y;
+			os >> x >> y;
+			move_trace.push_back({x, y});
+		}
 
-		QString text = QString("%1 %2 %3 %4 %5")
-				.arg(OPER_MOVE,
-					 QString::number(src_x),
-					 QString::number(src_y),
-					 QString::number(dest_x),
-					 QString::number(dest_y));
-		info_label->setText(text);
+		chess_board->moveChess(move_trace);
 	} else if(oper == OPER_GIVEUP) {
 		QMessageBox::information(this, "Game Over", "Congratulations! You win!");
 		chess_board->clearMarks();
