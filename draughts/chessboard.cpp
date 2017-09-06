@@ -207,10 +207,6 @@ bool ChessBoard::moveChess(const vector<pair<int, int>>& move_trace)
 	auto trace = draughts->move(move_trace);
 	if(trace.empty()) return false;
 
-	int src_x = move_trace.front().first, src_y = move_trace.front().second;
-	int dest_x = move_trace.back().first, dest_y = move_trace.back().second;
-	qDebug() << "MOVE " << src_x << " " << src_y << " " << dest_x << " " << dest_y;
-
 	if(!long_term_move) applyTrace(trace);
 
 	if(cur_player == DraughtsInfo::black)
