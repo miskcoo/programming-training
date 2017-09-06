@@ -1,4 +1,5 @@
 #include "draughts.h"
+#include "config.h"
 #include <cstring>
 
 Draughts::Draughts()
@@ -12,6 +13,31 @@ Draughts::Draughts()
 			else if(((i ^ j) & 1) && id >= 60)
 				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::white);
 			else status[i][j] = DraughtsInfo(i, j);
+		}
+}
+
+Draughts::Draughts(const char *game)
+{
+	for(int i = 0; i != 10; ++i)
+		for(int j = 0; j != 10; ++j)
+		{
+			switch(game[i * 10 + j])
+			{
+			case OPER_SETGAME_WHITE:
+				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::white, false);
+				break;
+			case OPER_SETGAME_WKING:
+				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::white, true);
+				break;
+			case OPER_SETGAME_BLACK:
+				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::black, false);
+				break;
+			case OPER_SETGAME_BKING:
+				status[i][j] = DraughtsInfo(i, j, DraughtsInfo::black, true);
+				break;
+			default:
+				status[i][j] = DraughtsInfo(i, j);
+			}
 		}
 }
 

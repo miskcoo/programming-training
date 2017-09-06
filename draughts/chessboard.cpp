@@ -13,11 +13,12 @@ ChessBoard::ChessBoard(QWidget *parent)
 	std::memset(cell_status, 0, sizeof(cell_status));
 }
 
-void ChessBoard::initBoard()
+void ChessBoard::initBoard(Draughts *game)
 {
 	std::memset(cell_status, 0, sizeof(cell_status));
 
 	draughts = std::make_shared<Draughts>();
+	if(game) *draughts = *game;
 	for(int i = 0; i != 10; ++i)
 	{
 		for(int j = 0; j != 10; ++j)
@@ -36,12 +37,14 @@ void ChessBoard::initBoard()
 	updatePieces();
 }
 
-void ChessBoard::startGame(DraughtsInfo::Types player)
+void ChessBoard::startGame(DraughtsInfo::Types player,
+						   DraughtsInfo::Types first_player,
+						   Draughts *game)
 {
 	this->player = player;
-	this->cur_player = DraughtsInfo::black;
+	this->cur_player = first_player;
 
-	initBoard();
+	initBoard(game);
 
 	if(cur_player == player)
 		markMoveCandidates(player);
@@ -133,18 +136,20 @@ void ChessBoard::cellClicked(int x, int y)
 				// multi-step move
 				long_term_move = true;
 				DraughtsTrace sub_trace;
-				for(auto it = avail_traces.begin(); it != avail_traces.end(); ++it)
+				for(auto it = avail_traces.begin(); it != avail_traces.end(); )
 				{
 					DraughtsTrace& trace = *it;
 					if(trace[2].x == x && trace[2].y == y)
 					{
 						sub_trace.assign(trace.begin(), trace.begin() + 3);
 						trace.erase(trace.begin(), trace.begin() + 2);
-						cur_move_trace.push_back({x, y});
+						++it;
 					} else {
 						it = avail_traces.erase(it);
 					}
 				}
+
+				cur_move_trace.push_back({x, y});
 
 				applyTrace(sub_trace);
 				if(trace_len <= 3)
@@ -177,7 +182,7 @@ void ChessBoard::applyTrace(const DraughtsTrace &trace)
 		cell_status[dest_x][dest_y] = CELL_MOVE_TRACE;
 		cell_status[src_x][src_y] = CELL_MOVE_TRACE;
 
-		cells[dest_x][dest_y]->moveAnimation( { getCellRect(dest_x, dest_y) }, 400);
+		cells[dest_x][dest_y]->moveAnimation( { getCellRect(dest_x, dest_y) }, ANIMATION_TIME);
 	} else if(trace.size() > 2) {
 		// eating move
 		vector<QRect> move_seq;
@@ -191,13 +196,13 @@ void ChessBoard::applyTrace(const DraughtsTrace &trace)
 		for(size_t i = 1; i < trace.size(); i += 2)
 		{
 			qreal start = 1.0 * (i / 2) / (trace.size() / 2);
-			cells[trace[i].x][trace[i].y]->fadeOut(start, 400);
+			cells[trace[i].x][trace[i].y]->fadeOut(start, ANIMATION_TIME * (trace.size() / 2));
 		}
 
 		cells[dest_x][dest_y] = cells[src_x][src_y];
 		cells[src_x][src_y] = nullptr;
 
-		cells[dest_x][dest_y]->moveAnimation(move_seq, 400);
+		cells[dest_x][dest_y]->moveAnimation(move_seq, ANIMATION_TIME * (trace.size() / 2));
 	}
 }
 

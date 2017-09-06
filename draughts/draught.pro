@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     chessboard.cpp \
     chesspiece.cpp \
 	draughts.cpp \
-    login_dialog.cpp
+    login_dialog.cpp \
+    listen_dialog.cpp
 
 HEADERS  += mainwindow.h \
     chessboard.h \
@@ -25,10 +26,12 @@ HEADERS  += mainwindow.h \
     chesspiece.h \
 	draughts.h \
 	utils.h \
-    login_dialog.h
+    login_dialog.h \
+    listen_dialog.h
 
 FORMS    += mainwindow.ui \
-    login_dialog.ui
+    login_dialog.ui \
+    listen_dialog.ui
 
 RESOURCES += \
     res.qrc

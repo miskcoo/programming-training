@@ -31,14 +31,22 @@ private slots:
 	void recvMessage();
 	void playerMove(vector<pair<int, int>>);
 	void gameEnd();
+	void peaceEnd();
 
 	void on_actionGive_Up_triggered();
+
+	void on_actionMake_Peace_triggered();
 
 private:
 	Ui::MainWindow *ui;
 	QWidget *window;
 	QLabel *info_label;
 	ChessBoard *chess_board;
+
+	// the following three variables are used for user-defined game
+	bool is_self_defined_game;
+	QString self_defined_game;
+	bool is_black_first;
 
 	QTcpServer *listen_socket;
 	QTcpSocket *rw_socket;

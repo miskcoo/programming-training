@@ -13,7 +13,7 @@ class ChessBoard : public QWidget
 public:
 	explicit ChessBoard(QWidget *parent = 0);
 
-	void initBoard();
+	void initBoard(Draughts *game);
 	QRect getCellRect(int row, int col);
 	pair<int, int> mapMouseToCell(QPoint);
 
@@ -25,7 +25,10 @@ public:
 	void applyTrace(const DraughtsTrace& trace);
 	void updatePieces();
 
-	void startGame(DraughtsInfo::Types player);
+	void startGame(DraughtsInfo::Types player,
+				   DraughtsInfo::Types first_player = DraughtsInfo::black,
+				   Draughts *game = nullptr);
+
 	DraughtsInfo::Types getPlayer() { return player; }
 	DraughtsInfo::Types getCurrentPlayer() { return cur_player; }
 signals:

@@ -30,6 +30,7 @@
     <addaction name="actionStart"/>
     <addaction name="actionConnect"/>
     <addaction name="actionGive_Up"/>
+    <addaction name="actionMake_Peace"/>
    </widget>
    <addaction name="menuGame"/>
   </widget>
@@ -47,6 +48,11 @@
   <action name="actionGive_Up">
    <property name="text">
     <string>Give Up</string>
+   </property>
+  </action>
+  <action name="actionMake_Peace">
+   <property name="text">
+    <string>Make Peace</string>
    </property>
   </action>
  </widget>

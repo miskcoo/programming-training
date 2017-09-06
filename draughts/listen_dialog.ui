@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LoginDialog</class>
- <widget class="QDialog" name="LoginDialog">
+ <class>ListenDialog</class>
+ <widget class="QDialog" name="ListenDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
-    <height>192</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -22,10 +16,10 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>140</y>
-     <width>211</width>
-     <height>31</height>
+     <x>30</x>
+     <y>240</y>
+     <width>341</width>
+     <height>32</height>
     </rect>
    </property>
    <property name="orientation">
@@ -38,10 +32,10 @@
   <widget class="QWidget" name="formLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>50</y>
-     <width>196</width>
-     <height>60</height>
+     <x>80</x>
+     <y>40</y>
+     <width>247</width>
+     <height>176</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -82,6 +76,44 @@
       </property>
      </widget>
     </item>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="init_game">
+      <property name="text">
+       <string>000000000000b000w0w0000000000b00b0000000000w00000000b000000000000b000000b000000000000w00000000000000 </string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_init_game">
+      <property name="text">
+       <string>Init Game</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QCheckBox" name="self_defined_game">
+      <property name="text">
+       <string>Self-Defined Game</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QRadioButton" name="white_first">
+      <property name="text">
+       <string>White First</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QRadioButton" name="black_first">
+      <property name="text">
+       <string>Black First</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -90,7 +122,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>LoginDialog</receiver>
+   <receiver>ListenDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -106,7 +138,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>LoginDialog</receiver>
+   <receiver>ListenDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
