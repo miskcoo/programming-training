@@ -25,7 +25,6 @@ HEADERS  += mainwindow.h \
     config.h \
     chesspiece.h \
 	draughts.h \
-	utils.h \
     login_dialog.h \
     listen_dialog.h
 

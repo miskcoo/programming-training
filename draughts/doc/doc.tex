@@ -124,13 +124,22 @@ Draughts是一款利用Qt实现的国际跳棋游戏，支持双人在线对战�
 
 此外，在进行棋子移动时，我们提供动画效果以增加观赏性。以及增加了认输的功能（位于菜单）。
 
+我们还支持在开局时自行定义开始局面以及先手，局面以 100 个字符的形式输入，以 0 表示空位，w 和 W 分别表示白色棋子和白色王棋，b 和 B 分别表示黑色棋子和黑色王棋。
+
 \section{部分实现细节}
 关于动画效果，可以利用 {\it QPropertyAnimation} 来实现。对于被吃棋子的消失效果，可以利用 {\it QGraphicsOpacityEffect} 来调节透明度。
 
 对于棋盘的内部黑色发光效果，可以针对矩形的四条边向内进行线性渐变的填充。
 
-对于网络的协议，我们简单用可见字符来传输数据，以{\it 操作名+参数}的格式进行通信。例如，对于移动棋子，数据传输格式就是
-\begin{center}
-	MOVE {\it <length of moving trace> <pairs of (x, y)>}
-\end{center}
+对于网络的协议，我们简单用可见字符来传输数据，以{\it 操作名+参数}的格式进行通信。各个操作的传输协议分别是：
+
+\begin{itemize}
+	\item {\bf 开局}：START
+	\item {\bf 放弃}：GIVEUP
+	\item {\bf 设置开始局面}：SETGAME {\it <first player [B|W]> <game status>}
+	\item {\bf 移动}：MOVE {\it <length of moving trace> <pairs of (x, y)>}
+	\item {\bf 求和}：MAKEPEACE
+	\item {\bf 同意求和}：CONFIRM\_PEACE
+	\item {\bf 否决求和}：DENIED\_PEACE
+\end{itemize}
 \end{document}
