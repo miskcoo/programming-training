@@ -169,40 +169,43 @@ DraughtsTrace Draughts::move(const vector<pair<int, int>>& move_trace)
 
 	// non-eating move
 	auto player = status[src_x][src_y].type;
-	if(!status[src_x][src_y].is_king)
+	if(move_trace.size() <= 2)
 	{
-		int dx = player == DraughtsInfo::black ? 1 : -1;
-		int dys[] = { 1, -1 };
-		for(int i = 0; i != 2; ++i)
+		if(!status[src_x][src_y].is_king)
 		{
-			int nx = src_x + dx, ny = src_y + dys[i];
-			if(check_coord_avail(nx, ny) && is_empty(nx, ny)
-				&& nx == dest_x && ny == dest_y)
+			int dx = player == DraughtsInfo::black ? 1 : -1;
+			int dys[] = { 1, -1 };
+			for(int i = 0; i != 2; ++i)
 			{
-				move_chess();
-				try_promote_king(status[nx][ny]);
-				return { status[src_x][src_y], status[nx][ny] };
-			}
-		}
-	} else {
-		int dxs[] = { 1, 1, -1, -1 };
-		int dys[] = { 1, -1, 1, -1 };
-		for(int i = 0; i != 4; ++i)
-		{
-			int nx = src_x + dxs[i], ny = src_y + dys[i];
-			while(check_coord_avail(nx, ny) && is_empty(nx, ny))
-			{
-				if(nx == dest_x && ny == dest_y)
+				int nx = src_x + dx, ny = src_y + dys[i];
+				if(check_coord_avail(nx, ny) && is_empty(nx, ny)
+					&& nx == dest_x && ny == dest_y)
 				{
 					move_chess();
 					try_promote_king(status[nx][ny]);
 					return { status[src_x][src_y], status[nx][ny] };
 				}
+			}
+		} else {
+			int dxs[] = { 1, 1, -1, -1 };
+			int dys[] = { 1, -1, 1, -1 };
+			for(int i = 0; i != 4; ++i)
+			{
+				int nx = src_x + dxs[i], ny = src_y + dys[i];
+				while(check_coord_avail(nx, ny) && is_empty(nx, ny))
+				{
+					if(nx == dest_x && ny == dest_y)
+					{
+						move_chess();
+						try_promote_king(status[nx][ny]);
+						return { status[src_x][src_y], status[nx][ny] };
+					}
 
-				nx += dxs[i], ny += dys[i];
+					nx += dxs[i], ny += dys[i];
+				}
 			}
 		}
-	}
+	} 
 
 	// eating move
 	DraughtsTrace trace;
