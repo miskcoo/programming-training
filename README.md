@@ -13,6 +13,7 @@ Table of Contents
 	 * [参考资料](#参考资料)
   * [Week 2: Internet Draughts](#week-2-internet-draughts)
 	 * [简介](#简介-1)
+	 * [基本功能](#基本功能-1)
 
 ## Week 1: Sudoku Game
 
