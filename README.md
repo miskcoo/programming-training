@@ -14,6 +14,8 @@ Table of Contents
   * [Week 2: Internet Draughts](#week-2-internet-draughts)
 	 * [简介](#简介-1)
 	 * [基本功能](#基本功能-1)
+  * [Week 3: 人物信息检索](#week-3-人物信息检索)
+	 * [简介](#简介-2)
 
 ## Week 1: Sudoku Game
 
@@ -103,3 +105,14 @@ Draughts 是一款利用 Qt 实现的国际跳棋游戏，支持双人在线对�
 我们的游戏实现在当前是自己的回合时，所有可以移动的棋子会被以绿色标出。当选中某个可移动棋子时，其本身以及下一步能够移动到的位置会被以黄色标出。
 
 由于有连跳以及能吃子就多吃的规则，在存在多条可选路径时，如果只标明最终可达位置，可能会造成困惑以及存在无法选择相同可达位置但不同走棋路线的困难。因此，我们允许玩家一步一步进行走棋，以便选择路径。
+
+## Week 3: 人物信息检索
+
+### 简介
+这是一个利用 Django 搭建的一个人物信息检索系统，大约从 Wikipedia 爬取了 10000 个人物信息，并且提取了其中 Infobox 的对应信息。
+
+对于爬取的信息，我们重新组织了其显示的格式并且提供了一个搜索页面，允许根据关键词对其进行搜索，并且还可以根据原先信息的特定字段（如Born，Name，Nationality等）进行关键字查询。搜索结果按照匹配的关键字个数从高到底排序后进行显示，同时匹配的关键字将会被高亮标出。另外，如果结果过多将会分页进行显示。
+
+![](https://github.com/miskcoo/programming-training/blob/wiki-index/wiki-index/doc/turing-1.png?raw=true)
+
+![](https://github.com/miskcoo/programming-training/blob/wiki-index/wiki-index/doc/turing-4.png?raw=true)
