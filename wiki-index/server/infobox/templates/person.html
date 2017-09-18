@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{% include 'bootstrap_header.html' %}
+	{% if highlight %}
+	<script>
+		{% autoescape off %}
+		var search_keywords = {{ highlight }};
+		{% endautoescape %}
+		{% include 'highlight.js' %}
+	</script>
+	{% endif %}
+	<title>{{ person_name }}</title>
+</head>
+<body>
+	<div class="container">
+		{% include 'person_item.html' %}
+		<div class="text-center">
+			<ul class="pagination justify-content-center">
+				<li class="page-item">
+					<a class="page-link" href="{% url 'person' person_id|add:"-1" %}" aria-label="Previous">
+						<span aria-hidden="true">Previous</span>
+						<span class="sr-only">Previous</span>
+					</a>
+				</li>
+				<li class="page-item">
+					<a class="page-link" href="{% url 'person' person_id|add:"1" %}" aria-label="Next">
+						<span aria-hidden="true">Next</span>
+						<span class="sr-only">Next</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		{% include 'search_box.html' %}
+	</div>
+</body>
+</html>

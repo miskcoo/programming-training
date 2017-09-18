@@ -55,3 +55,9 @@ CMakeLists.txt.user*
 *.log
 _minted-doc
 
+# Python
+*.py[cod]
+__pycache__/
+*$py.class
+
+wiki-index/data

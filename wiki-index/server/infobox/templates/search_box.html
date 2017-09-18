@@ -1,0 +1,72 @@
+<script>
+function deal_submit()
+{
+	var self_defined_form = $('#search_form>.self-defined-form');
+	for(var i = 0; i < self_defined_form.length; ++i)
+	{
+		var elem = $(self_defined_form[i]);
+		var key = elem.find('.self-defined-key')[0].value;
+		var value_elem = elem.find('.self-defined-value')[0];
+		if(key)
+			value_elem.name = 'f_' + key.toLowerCase().replace(' ', '_');
+		else value_elem.name = '';
+	}
+}
+
+function add_field()
+{
+	var elem = $('<div class="form-group row self-defined-form"> \
+		<input type="text" class="col-2 col-form-label self-defined-key" placeholder="Example: Died"> \
+		<div class="col-10"> \
+			<input class="form-control self-defined-value" type="search" placeholder="Example: January 13, 1986"> \
+		</div> \
+	</div>');
+
+	elem.insertBefore($("#search_form>.form-group").last());
+}
+
+function remove_field()
+{
+	var forms = $('#search_form>.self-defined-form');
+	if(forms.length > 0) forms.last().remove();
+}
+</script>
+<form id="search_form" action="{% url 'search' %}" method="GET" onsubmit="deal_submit()">
+	<div class="form-group row">
+		<label class="col-2 col-form-label" for="search_q">Search</label>
+		<div class="col-10">
+			<input class="form-control" type="search" id="search_q" name="q" placeholder="Search Text">
+		</div>
+	</div>
+	<div class="form-group row">
+		<label class="col-2 col-form-label" for="search_name">Name</label>
+		<div class="col-10">
+			<input class="form-control" type="search" id="search_name" name="f_name" placeholder="Example: Alan Turing">
+		</div>
+	</div>
+	<div class="form-group row">
+		<label class="col-2 col-form-label" for="search_nationality">Nationality</label>
+		<div class="col-10">
+			<input class="form-control" type="search" id="search_nationality" name="f_nationality" placeholder="Example: American">
+		</div>
+	</div>
+	<div class="form-group row">
+		<label class="col-2 col-form-label" for="search_born">Born</label>
+		<div class="col-10">
+			<input class="form-control" type="search" id="search_born" name="f_born" placeholder="Example: January 13, 1986">
+		</div>
+	</div>
+	<div class="form-group row self-defined-form">
+		<input type="text" class="col-2 col-form-label self-defined-key" placeholder="Example: Died">
+		<div class="col-10">
+			<input class="form-control self-defined-value" type="search" placeholder="Example: January 13, 1986">
+		</div>
+	</div>
+	<div class="form-group row">
+		<div class="offset-2 col-10">
+			<button type="button" onclick="add_field()" class="btn btn-primary">Add Field</button>
+			<button type="button" onclick="remove_field()" class="btn btn-primary">Remove Field</button>
+			<button type="submit" class="btn btn-primary">Search</button>
+		</div>
+	</div>
+</form>

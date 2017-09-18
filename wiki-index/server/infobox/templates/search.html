@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	{% include 'bootstrap_header.html' %}
+	<script>
+		{% autoescape off %}
+		var search_keywords = {{ keywords }};
+		{% endautoescape %}
+		{% include 'highlight.js' %}
+
+		$('document').ready( function() {
+			var append_str = '';
+			for(var i = 0; i != search_keywords.length; ++i)
+			{
+				if(i > 0) append_str += '&';
+				append_str += 'highlight=' + search_keywords[i];
+			}
+
+			var elems = $('.append_highlight');
+			for(var i = 0; i != elems.length; ++i)
+			{
+				var elem = $(elems[i]);
+				var href = elem.attr('href');
+				elem.attr('href', href + '?' + append_str);
+			}
+		} );
+
+		function goto_page(page_id)
+		{
+			var get_query = location.search;
+			if(get_query.search('page=') != -1)
+				get_query = get_query.replace(/page=\d+/, 'page=' + page_id);
+			else get_query += '&page=' + page_id;
+			window.open(get_query, name='_self');
+		}
+	</script>
+	<title>Search</title>
+</head>
+<body>
+	<div class="container">
+		<table class="table">
+			{% for info in results %}
+			<tr>
+				<td>
+					<a class="info append_highlight" href="{% url 'person' info.person_id %}">{{ info.person_name }}</a>
+					{% with info.person as person %}
+					{% include 'person_item.html' %}
+					{% endwith %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+
+		{% if results.has_other_pages %}
+		<div class="text-center">
+			<ul class="pagination justify-content-center">
+				{% if results.has_previous %}
+				<li class="page-item">
+					<a class="page-link" href="javascript: goto_page({{ results.previous_page_number }});" aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+						<span class="sr-only">Previous</span>
+					</a>
+				</li>
+				{% endif %}
+				{% for i in show_page_range %}
+				{% if i == results.number %}
+				<li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+				{% else %}
+				<li class="page-item"><a class="page-link" href="javascript: goto_page({{ i }});">{{ i }}</a></li>
+				{% endif %}
+				{% endfor %}
+				{% if results.has_next %}
+				<li class="page-item">
+					<a class="page-link" href="javascript: goto_page({{ results.next_page_number }});" aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+						<span class="sr-only">Next</span>
+					</a>
+				</li>
+				{% endif %}
+			</ul>
+		</div>
+		{% endif %}
+		{% include 'search_box.html' %}
+	</div>
+</body>
+</html>
+

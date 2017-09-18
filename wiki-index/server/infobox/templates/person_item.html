@@ -1,0 +1,47 @@
+<table class="table">
+	{% autoescape off %}
+	{% for k, v0 in person.items %}
+		{% if k != 'not_display' %}
+		<tr>
+			<th colspan="2" style="text-align:center;">{{ k|title }}</th>
+		</tr>
+		{% endif %}
+		{% load filter %}
+		{% for k, v in v0.items %}
+		{% if forloop.first and v0.image %}
+		<tr>
+			<td colspan="2" style="text-align:center;">
+				<img src="http:{{ v0.image }}">
+			</td>
+		</tr>
+		{% endif %}
+	    {% if k != 'image' %}
+			<tr>
+				{% if v|get_type == 'dict' %}
+					<td colspan="2">
+					{% with v as person %}
+						{% include 'person_item.html' %}
+					{% endwith %}
+					</td>
+				{% elif k == 'sub_list' %}
+					<td colspan="2">
+						<ul>{% for item in v %} <li class="info">{{ item|strip }}</li> {% endfor %}</ul>
+					</td>
+				{% else %}
+					<th width="20%">{{ k|strip|title }}</th>
+					<td width="80%">
+						{% if v|get_type == 'list' %}
+							<ul>{% for item in v %} <li class="info">{{ item|strip }}</li> {% endfor %}</ul>
+						{% elif v|is_image %}
+							<img src="{{ v|cut_image }}">
+						{% else %}
+							<span class="info">{{ v|strip }}</span>
+						{% endif %}
+					</td>
+				{% endif %}
+			</tr>
+		{% endif %}
+		{% endfor %}
+	{% endfor %}
+	{% endautoescape %}
+</table>
